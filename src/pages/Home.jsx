@@ -428,7 +428,7 @@ export function Home() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {features.map((feat, idx) => (
-              <Card key={idx} className="flex flex-col text-left group p-8 rounded-2xl" hoverEffect={true}>
+              <Card key={idx} className="flex flex-col text-left group p-8 rounded-2xl hover-elevation" hoverEffect={false}>
                 <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 border border-primary/20 text-primary-light mb-5 group-hover:scale-110 transition-transform duration-300">
                   {feat.icon}
                 </div>

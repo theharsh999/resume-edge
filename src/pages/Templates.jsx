@@ -84,68 +84,90 @@ export function Templates() {
           </div>
 
           {/* Grid of Templates */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 mb-16">
             {templates.map((template) => (
-              <Card key={template.id} className="flex flex-col h-full group" hoverEffect={true}>
+              <Card 
+                key={template.id} 
+                className="flex flex-col h-full group p-7 rounded-2xl bg-surface/40 border-slate-800/60 hover:border-slate-700/80 hover:shadow-premium-glow hover-elevation" 
+                hoverEffect={false}
+              >
                 {/* Template Mockup representation */}
-                <div className={`aspect-[3/4] w-full rounded-lg bg-gradient-to-br ${template.color} border border-slate-800/80 mb-6 flex flex-col p-4 justify-between overflow-hidden relative group-hover:border-slate-700 transition-all duration-350`}>
+                <div className={`aspect-[3/4] w-full rounded-xl bg-gradient-to-br ${template.color} border border-slate-800/80 mb-6 flex flex-col p-5 justify-between overflow-hidden relative group-hover:border-slate-700/80 transition-all duration-300 group-hover:scale-[1.02]`}>
                   
                   {/* Visual resume outline */}
-                  <div className="space-y-3 opacity-60">
-                    <div className="flex justify-between items-center">
-                      <div className="h-3.5 w-24 bg-slate-200/20 rounded"></div>
-                      <div className="h-2 w-16 bg-slate-200/10 rounded"></div>
+                  <div className="space-y-4 w-full pr-4 text-left opacity-75 group-hover:opacity-95 transition-opacity duration-300">
+                    <div className="flex justify-between items-center border-b border-white/5 pb-2">
+                      <div className="space-y-1">
+                        <div className="h-3 w-24 bg-white/25 rounded"></div>
+                        <div className="h-2 w-14 bg-primary/35 rounded animate-pulse"></div>
+                      </div>
+                      <div className="h-2.5 w-16 bg-white/10 rounded"></div>
                     </div>
-                    <div className="h-1.5 w-full bg-slate-200/10 rounded"></div>
-                    <div className="space-y-1.5 pt-2">
-                      <div className="h-1.5 w-1/3 bg-primary/30 rounded"></div>
-                      <div className="h-2 w-full bg-slate-200/25 rounded"></div>
-                      <div className="h-2 w-5/6 bg-slate-200/25 rounded"></div>
+                    
+                    <div className="space-y-2">
+                      <div className="h-2 w-12 bg-white/20 rounded"></div>
+                      <div className="h-1.5 w-full bg-white/10 rounded"></div>
+                      <div className="h-1.5 w-5/6 bg-white/10 rounded"></div>
                     </div>
-                    <div className="space-y-1.5 pt-2">
-                      <div className="h-1.5 w-1/4 bg-primary/30 rounded"></div>
-                      <div className="h-2 w-full bg-slate-200/25 rounded"></div>
-                      <div className="h-2 w-4/5 bg-slate-200/25 rounded"></div>
+                    
+                    <div className="space-y-2">
+                      <div className="h-2 w-16 bg-white/20 rounded"></div>
+                      <div className="h-1.5 w-full bg-white/10 rounded"></div>
+                      <div className="h-1.5 w-4/5 bg-white/10 rounded"></div>
                     </div>
                   </div>
 
                   {/* Hover Actions overlay */}
-                  <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 flex items-center justify-center gap-3 transition-opacity duration-300">
+                  <div className="absolute inset-0 bg-slate-950/85 backdrop-blur-[3px] opacity-0 group-hover:opacity-100 flex items-center justify-center gap-3 transition-opacity duration-350">
                     <Button 
                       variant="primary" 
-                      size="sm" 
+                      size="md" 
                       onClick={() => handleSelectTemplate(template.id)}
-                      className="gap-1.5 font-semibold"
+                      className="gap-2 font-bold px-6 shadow-premium-glow"
                     >
-                      Use Template <ArrowRight className="h-3.5 w-3.5" />
+                      Use Template <ArrowRight className="h-4 w-4" />
                     </Button>
                   </div>
 
-                  <div className="flex gap-2">
-                    {template.tags.map((tag, idx) => (
-                      <Badge key={idx} variant="muted" className="text-[10px] bg-slate-900/60 border-slate-800 py-0 px-2 font-medium">
-                        {tag}
-                      </Badge>
-                    ))}
+                  <div className="flex flex-wrap gap-1.5 relative z-10">
+                    {template.tags.map((tag, idx) => {
+                      const isPopular = tag.toLowerCase().includes('popular');
+                      const isAts = tag.toLowerCase().includes('ats');
+                      return (
+                        <Badge 
+                          key={idx} 
+                          variant={isPopular ? 'primary' : isAts ? 'success' : 'muted'} 
+                          className={`text-[9px] py-0.5 px-2 font-extrabold uppercase tracking-wider ${
+                            isPopular 
+                              ? 'bg-primary/10 border-primary-light/20 text-primary-light' 
+                              : isAts 
+                              ? 'bg-success/15 border-success/30 text-success' 
+                              : 'bg-slate-900/60 border-slate-800 text-slate-300'
+                          }`}
+                        >
+                          {tag}
+                        </Badge>
+                      );
+                    })}
                   </div>
                 </div>
 
-                <div className="flex-grow flex flex-col">
-                  <h3 className="text-lg font-bold text-text mb-2 group-hover:text-primary transition-colors duration-200">
+                <div className="flex-grow flex flex-col text-left">
+                  <h3 className="text-xl font-bold text-text mb-2 group-hover:text-primary-light transition-colors duration-200">
                     {template.name}
                   </h3>
-                  <p className="text-sm text-muted leading-relaxed flex-grow font-medium">
+                  <p className="text-xs text-muted leading-relaxed flex-grow font-semibold">
                     {template.description}
                   </p>
                 </div>
 
                 <div className="mt-6 pt-4 border-t border-slate-900 flex justify-between items-center">
-                  <span className="text-xs text-muted font-bold">100% Free Access</span>
+                  <span className="text-[10px] text-muted font-extrabold uppercase tracking-wider">100% Free Access</span>
                   <button 
                     onClick={() => handleSelectTemplate(template.id)}
-                    className="text-xs font-bold text-primary hover:text-primary-light flex items-center gap-1 transition-colors duration-200 cursor-pointer"
+                    className="text-xs font-bold text-primary hover:text-primary-light flex items-center gap-1.5 transition-colors duration-200 cursor-pointer"
                   >
-                    Build Now <ArrowRight className="h-3 w-3" />
+                    Build Now <ArrowRight className="h-3.5 w-3.5" />
                   </button>
                 </div>
               </Card>

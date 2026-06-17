@@ -134,6 +134,15 @@ export function Builder() {
 
   // Toasts state management
   const [toasts, setToasts] = useState([]);
+  const [showOnboarding, setShowOnboarding] = useState(true);
+
+  const isEmptyData = 
+    !resumeData.personal.fullName && 
+    !resumeData.summary && 
+    (resumeData.skills || []).length === 0 && 
+    (resumeData.experience || []).length === 0 && 
+    (resumeData.education || []).length === 0 && 
+    (resumeData.projects || []).length === 0;
 
   const addToast = (message, type = 'success') => {
     const id = Date.now();
@@ -387,16 +396,84 @@ export function Builder() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* Column 1: Form (col-span-4) */}
           <div className="lg:col-span-4 space-y-6">
-            <ResumeForm 
-              data={resumeData} 
-              onDataChange={setResumeData} 
-              template={template}
-              onTemplateChange={handleTemplateChange}
-              settings={settings}
-              onSettingsChange={handleSettingsChange}
-              sectionOrder={sectionOrder}
-              onReorderSections={handleReorderSections}
-            />
+            {isEmptyData && showOnboarding ? (
+              <div className="bg-surface border border-slate-800 rounded-2xl p-6 md:p-8 space-y-6 text-left shadow-2xl relative overflow-hidden animate-fade-in">
+                {/* Visual light glow */}
+                <div className="absolute -top-20 -left-20 h-40 w-40 rounded-full bg-primary/15 blur-3xl pointer-events-none"></div>
+                
+                {/* Onboarding Header */}
+                <div className="space-y-2 relative z-10">
+                  <Badge variant="primary" className="mb-1">Getting Started</Badge>
+                  <h3 className="text-xl md:text-2xl font-bold tracking-tight text-text">Welcome to ResumeEdge</h3>
+                  <p className="text-xs text-muted leading-relaxed font-semibold">
+                    Create ATS-friendly resumes in minutes. Choose how you want to start building your professional profile.
+                  </p>
+                </div>
+
+                {/* Pure CSS Onboarding Illustration */}
+                <div className="relative w-full h-32 bg-slate-950/60 rounded-xl border border-slate-850/80 overflow-hidden flex items-center justify-center mb-6">
+                  {/* Ambient glowing background circles */}
+                  <div className="absolute top-1/2 left-1/4 h-20 w-20 rounded-full bg-primary/10 blur-2xl -translate-y-1/2"></div>
+                  <div className="absolute top-1/2 right-1/4 h-20 w-20 rounded-full bg-secondary/10 blur-2xl -translate-y-1/2"></div>
+                  
+                  {/* Resume preview simulation */}
+                  <div className="relative w-20 h-28 bg-slate-900 border border-slate-800 rounded-lg p-2.5 shadow-xl flex flex-col justify-between">
+                    <div className="space-y-1.5">
+                      {/* Avatar & Header */}
+                      <div className="flex gap-1.5 items-center">
+                        <div className="h-4.5 w-4.5 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center text-[7px] font-black text-primary-light">✓</div>
+                        <div className="h-1.5 w-10 bg-slate-800 rounded"></div>
+                      </div>
+                      <div className="h-1 w-full bg-slate-800 rounded"></div>
+                      
+                      {/* Content lines */}
+                      <div className="space-y-1 pt-1.5">
+                        <div className="h-0.5 w-5/6 bg-slate-800/80 rounded"></div>
+                        <div className="h-0.5 w-2/3 bg-slate-800/80 rounded"></div>
+                        <div className="h-0.5 w-full bg-slate-800/80 rounded"></div>
+                      </div>
+                    </div>
+                    
+                    {/* Page indicator check */}
+                    <div className="flex justify-between items-center pt-2">
+                      <div className="h-1.5 w-6 bg-secondary/20 border border-secondary/30 rounded"></div>
+                      <div className="h-1.5 w-1.5 rounded-full bg-success animate-pulse"></div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex flex-col gap-3 relative z-10 pt-2">
+                  <button
+                    onClick={handleLoadDemo}
+                    type="button"
+                    className="w-full flex items-center justify-center gap-2 text-xs font-bold bg-primary hover:bg-primary-dark text-text border border-primary-light/25 shadow-premium-glow hover:shadow-premium-glow-hover px-4 py-2.5 rounded-xl transition-all active:scale-[0.98] cursor-pointer"
+                  >
+                    <Sparkles className="h-3.5 w-3.5" />
+                    Load Demo Resume
+                  </button>
+
+                  <button
+                    onClick={() => setShowOnboarding(false)}
+                    type="button"
+                    className="w-full flex items-center justify-center gap-2 text-xs font-bold bg-slate-950/40 hover:bg-slate-900 border border-slate-800 hover:border-slate-700 px-4 py-2.5 rounded-xl transition-all text-text active:scale-[0.98] cursor-pointer"
+                  >
+                    Start From Scratch
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <ResumeForm 
+                data={resumeData} 
+                onDataChange={setResumeData} 
+                template={template}
+                onTemplateChange={handleTemplateChange}
+                settings={settings}
+                onSettingsChange={handleSettingsChange}
+                sectionOrder={sectionOrder}
+                onReorderSections={handleReorderSections}
+              />
+            )}
           </div>
 
           {/* Column 2: Live Sticky Preview (col-span-8) */}
