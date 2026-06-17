@@ -73,22 +73,22 @@ export function ResumePreview({
   // Spacing Densities Map
   const densityStyles = {
     comfortable: {
+      padding: 'p-8 md:p-10',
+      spacing: 'space-y-7',
+      itemSpacing: 'space-y-5',
+      sectionSpacing: 'space-y-3'
+    },
+    balanced: {
       padding: 'p-6 md:p-8',
-      spacing: 'space-y-6',
+      spacing: 'space-y-5',
       itemSpacing: 'space-y-4',
       sectionSpacing: 'space-y-2'
     },
-    balanced: {
-      padding: 'p-5 md:p-6',
-      spacing: 'space-y-4.5',
-      itemSpacing: 'space-y-3',
-      sectionSpacing: 'space-y-1.5'
-    },
     compact: {
-      padding: 'p-3 md:p-4.5',
-      spacing: 'space-y-3',
-      itemSpacing: 'space-y-2',
-      sectionSpacing: 'space-y-1'
+      padding: 'p-4 md:p-5',
+      spacing: 'space-y-3.5',
+      itemSpacing: 'space-y-2.5',
+      sectionSpacing: 'space-y-1.5'
     }
   };
 
@@ -420,7 +420,7 @@ export function ResumePreview({
           </div>
         ) : (
           /* Render designated layout template */
-          <div id="resume-print-content" className="animate-fade-in bg-slate-900 rounded-xl">
+          <div id="resume-print-content" className="animate-fade-in bg-slate-900 rounded-xl border border-white/10 shadow-[0_10px_35px_rgba(0,0,0,0.6)]">
             {template === 'modern' && <ModernTemplate />}
             {template === 'professional' && <ProfessionalTemplate />}
             {template === 'minimal' && <MinimalTemplate />}

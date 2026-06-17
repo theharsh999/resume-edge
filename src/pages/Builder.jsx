@@ -1,15 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Layout } from '../components/layout/Layout';
 import { Container } from '../components/ui/Container';
-import { Card } from '../components/ui/Card';
 import { Badge } from '../components/ui/Badge';
-import { TemplateSwitcher } from '../components/builder/TemplateSwitcher';
 import { ResumeForm } from '../components/builder/ResumeForm';
 import { ResumePreview } from '../components/builder/ResumePreview';
-
-// Customization and Ordering Panels
-import { ResumeSettings } from '../components/builder/ResumeSettings';
-import { SectionDndList } from '../components/builder/SectionDndList';
 import { Toast } from '../components/ui/Toast';
 
 // Analytics dashboard widgets
@@ -19,7 +13,7 @@ import { CompletionTracker } from '../components/builder/CompletionTracker';
 import { RecruiterChecklist } from '../components/builder/RecruiterChecklist';
 import { ExportPDFButton } from '../components/builder/ExportPDFButton';
 
-import { Trash2, ArrowLeft } from 'lucide-react';
+import { Trash2, ArrowLeft, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const LOCAL_STORAGE_KEY_DATA = 'resumeedge_data';
@@ -347,7 +341,7 @@ export function Builder() {
     <Layout>
       <Container className="py-8">
         {/* Header toolbar */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8 border-b border-slate-900 pb-6">
           <div className="text-left space-y-1">
             <div className="flex items-center gap-2">
               <Link to="/" className="text-muted hover:text-text transition-colors duration-200 text-xs font-semibold flex items-center">
@@ -358,46 +352,71 @@ export function Builder() {
             <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-text">Resume Workspace</h1>
             <p className="text-muted text-xs md:text-sm font-medium">Build, check score, customize styling themes, and export A4 PDFs in real time.</p>
           </div>
-          <button
-            onClick={handleClearAll}
-            type="button"
-            className="flex items-center gap-1.5 text-xs font-semibold text-red-400 hover:text-red-300 transition-colors border border-red-500/10 hover:border-red-500/20 bg-red-950/10 px-3 py-1.5 rounded-lg shrink-0 cursor-pointer self-start md:self-auto"
-          >
-            <Trash2 className="h-3.5 w-3.5" /> Clear Workspace
-          </button>
-        </div>
+          
+          <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
+            {/* Load Demo Resume */}
+            <button
+              onClick={handleLoadDemo}
+              type="button"
+              className="flex items-center justify-center gap-1.5 text-xs font-semibold bg-surface hover:bg-slate-800 text-text border border-slate-800 hover:border-slate-700 px-4 py-2 rounded-lg transition-all active:scale-[0.98] shrink-0 cursor-pointer h-9"
+            >
+              <Sparkles className="h-3.5 w-3.5 text-primary-light" />
+              Load Demo
+            </button>
 
-        {/* 3-Column Split Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          {/* Column 1: Form & Customization Switchers (col-span-4) */}
-          <div className="lg:col-span-4 space-y-6">
-            <Card hoverEffect={false} className="p-4 md:p-5 border-slate-800 bg-surface/50 space-y-4">
-              <TemplateSwitcher activeTemplate={template} onTemplateChange={handleTemplateChange} />
-              
-              {/* Styling settings selector accordion */}
-              <ResumeSettings settings={settings} onSettingsChange={handleSettingsChange} />
-
-              {/* Drag and Drop layout sortable list */}
-              <SectionDndList items={sectionOrder} onReorder={handleReorderSections} />
-            </Card>
-
-            <ResumeForm data={resumeData} onDataChange={setResumeData} onLoadDemo={handleLoadDemo} />
-          </div>
-
-          {/* Column 2: Live Sticky Preview (col-span-5) */}
-          <div className="lg:col-span-5 lg:sticky lg:top-24">
-            <ResumePreview data={resumeData} template={template} settings={settings} sectionOrder={sectionOrder} />
-          </div>
-
-          {/* Column 3: Analytics Dashboard (col-span-3) */}
-          <div className="lg:col-span-3 lg:sticky lg:top-24 space-y-6">
-            {/* PDF export button wrapper */}
+            {/* Export PDF Button wrapper */}
             <ExportPDFButton 
               elementId="resume-print-content" 
               filename={exportFilename} 
               onSuccess={() => addToast('Resume PDF downloaded!', 'success')}
+              className="h-9 px-4 text-xs font-semibold shrink-0"
             />
 
+            {/* Clear Workspace button */}
+            <button
+              onClick={handleClearAll}
+              type="button"
+              className="flex items-center justify-center gap-1.5 text-xs font-semibold text-red-400 hover:text-red-300 transition-colors border border-red-500/10 hover:border-red-500/20 bg-red-950/10 px-3 py-1.5 rounded-lg shrink-0 cursor-pointer h-9"
+            >
+              <Trash2 className="h-3.5 w-3.5" /> Clear Workspace
+            </button>
+          </div>
+        </div>
+
+        {/* 2-Column Split Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          {/* Column 1: Form (col-span-4) */}
+          <div className="lg:col-span-4 space-y-6">
+            <ResumeForm 
+              data={resumeData} 
+              onDataChange={setResumeData} 
+              template={template}
+              onTemplateChange={handleTemplateChange}
+              settings={settings}
+              onSettingsChange={handleSettingsChange}
+              sectionOrder={sectionOrder}
+              onReorderSections={handleReorderSections}
+            />
+          </div>
+
+          {/* Column 2: Live Sticky Preview (col-span-8) */}
+          <div className="lg:col-span-8 lg:sticky lg:top-24">
+            <ResumePreview data={resumeData} template={template} settings={settings} sectionOrder={sectionOrder} />
+          </div>
+        </div>
+
+        {/* Separator */}
+        <div className="border-t border-slate-900 my-16"></div>
+
+        {/* Bottom Area: Dedicated Analytics Dashboard */}
+        <div className="space-y-8">
+          <div className="text-left space-y-2">
+            <Badge variant="secondary">Resume Intelligence</Badge>
+            <h2 className="text-2xl font-bold tracking-tight text-text">Recruiter & ATS Optimization</h2>
+            <p className="text-muted text-xs md:text-sm font-medium">Real-time grading, automated checklist items, and expert improvements feedback.</p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10">
             {/* Score circle */}
             <ATSScoreCard score={score} />
 

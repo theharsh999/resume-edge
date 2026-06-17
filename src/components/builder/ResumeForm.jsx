@@ -12,8 +12,20 @@ import {
   Trash2, 
   Sparkles 
 } from 'lucide-react';
+import { TemplateSwitcher } from './TemplateSwitcher';
+import { ResumeSettings } from './ResumeSettings';
+import { SectionDndList } from './SectionDndList';
 
-export function ResumeForm({ data, onDataChange, onLoadDemo }) {
+export function ResumeForm({ 
+  data, 
+  onDataChange, 
+  template, 
+  onTemplateChange, 
+  settings, 
+  onSettingsChange, 
+  sectionOrder, 
+  onReorderSections 
+}) {
   const [skillInput, setSkillInput] = useState('');
 
   // Helper to deep update fields
@@ -127,21 +139,17 @@ export function ResumeForm({ data, onDataChange, onLoadDemo }) {
 
   return (
     <div className="space-y-4">
-      {/* Demo loader panel */}
-      <div className="flex flex-col sm:flex-row gap-3 justify-between sm:items-center bg-slate-950/40 p-4 border border-slate-800 rounded-xl text-left">
-        <div>
-          <span className="text-xs font-bold text-text flex items-center gap-1.5">
-            <Sparkles className="h-4 w-4 text-primary-light animate-pulse" /> Load Pre-filled Data
-          </span>
-          <p className="text-[10px] text-muted font-medium mt-0.5">Test templates instantly with a realistic profile.</p>
-        </div>
-        <Button onClick={onLoadDemo} size="sm" variant="secondary" type="button" className="text-xs font-semibold whitespace-nowrap self-start sm:self-auto">
-          Load Demo Resume
-        </Button>
-      </div>
-
       {/* Accordions */}
       <div className="space-y-4 text-left">
+        {/* Template Switcher Accordion */}
+        <TemplateSwitcher activeTemplate={template} onTemplateChange={onTemplateChange} />
+
+        {/* Theme Settings Accordion */}
+        <ResumeSettings settings={settings} onSettingsChange={onSettingsChange} />
+
+        {/* Section Ordering Accordion */}
+        <SectionDndList items={sectionOrder} onReorder={onReorderSections} />
+
         {/* Personal info */}
         <SectionAccordion title="Personal Information" icon={User} defaultOpen={true}>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
@@ -151,7 +159,7 @@ export function ResumeForm({ data, onDataChange, onLoadDemo }) {
                 type="text"
                 value={data.personal.fullName || ''}
                 onChange={(e) => updatePersonal('fullName', e.target.value)}
-                className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-text focus:outline-none focus:border-primary transition-colors font-semibold"
+                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-text focus:outline-none focus:border-primary transition-colors font-semibold"
                 placeholder="Sarah Jenkins"
               />
             </div>
@@ -161,7 +169,7 @@ export function ResumeForm({ data, onDataChange, onLoadDemo }) {
                 type="text"
                 value={data.personal.role || ''}
                 onChange={(e) => updatePersonal('role', e.target.value)}
-                className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-text focus:outline-none focus:border-primary transition-colors font-semibold"
+                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-text focus:outline-none focus:border-primary transition-colors font-semibold"
                 placeholder="Lead Frontend Architect"
               />
             </div>
@@ -171,7 +179,7 @@ export function ResumeForm({ data, onDataChange, onLoadDemo }) {
                 type="email"
                 value={data.personal.email || ''}
                 onChange={(e) => updatePersonal('email', e.target.value)}
-                className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-text focus:outline-none focus:border-primary transition-colors font-semibold"
+                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-text focus:outline-none focus:border-primary transition-colors font-semibold"
                 placeholder="sarah@edge.io"
               />
             </div>
@@ -181,7 +189,7 @@ export function ResumeForm({ data, onDataChange, onLoadDemo }) {
                 type="text"
                 value={data.personal.phone || ''}
                 onChange={(e) => updatePersonal('phone', e.target.value)}
-                className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-text focus:outline-none focus:border-primary transition-colors font-semibold"
+                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-text focus:outline-none focus:border-primary transition-colors font-semibold"
                 placeholder="+1 (555) 019-2834"
               />
             </div>
@@ -191,7 +199,7 @@ export function ResumeForm({ data, onDataChange, onLoadDemo }) {
                 type="text"
                 value={data.personal.location || ''}
                 onChange={(e) => updatePersonal('location', e.target.value)}
-                className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-text focus:outline-none focus:border-primary transition-colors font-semibold"
+                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-text focus:outline-none focus:border-primary transition-colors font-semibold"
                 placeholder="San Francisco, CA"
               />
             </div>
@@ -201,7 +209,7 @@ export function ResumeForm({ data, onDataChange, onLoadDemo }) {
                 type="text"
                 value={data.personal.linkedin || ''}
                 onChange={(e) => updatePersonal('linkedin', e.target.value)}
-                className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-text focus:outline-none focus:border-primary transition-colors font-semibold"
+                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-text focus:outline-none focus:border-primary transition-colors font-semibold"
                 placeholder="https://linkedin.com/in/sarah"
               />
             </div>
@@ -211,7 +219,7 @@ export function ResumeForm({ data, onDataChange, onLoadDemo }) {
                 type="text"
                 value={data.personal.github || ''}
                 onChange={(e) => updatePersonal('github', e.target.value)}
-                className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-text focus:outline-none focus:border-primary transition-colors font-semibold"
+                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-text focus:outline-none focus:border-primary transition-colors font-semibold"
                 placeholder="https://github.com/sarah-jenkins"
               />
             </div>
@@ -229,7 +237,7 @@ export function ResumeForm({ data, onDataChange, onLoadDemo }) {
               rows="4"
               value={data.summary || ''}
               onChange={(e) => updateSummary(e.target.value)}
-              className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-text focus:outline-none focus:border-primary transition-colors leading-relaxed font-semibold resize-none"
+              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-text focus:outline-none focus:border-primary transition-colors leading-relaxed font-semibold resize-none"
               placeholder="Detail your professional highlights..."
             />
           </div>
@@ -243,7 +251,7 @@ export function ResumeForm({ data, onDataChange, onLoadDemo }) {
                 type="text"
                 value={skillInput}
                 onChange={(e) => setSkillInput(e.target.value)}
-                className="flex-grow bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-text focus:outline-none focus:border-primary transition-colors font-semibold"
+                className="flex-grow bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-text focus:outline-none focus:border-primary transition-colors font-semibold"
                 placeholder="e.g. Next.js"
               />
               <Button type="submit" size="sm" className="h-9 shrink-0 gap-1 text-xs font-semibold">
@@ -294,7 +302,7 @@ export function ResumeForm({ data, onDataChange, onLoadDemo }) {
                         type="text"
                         value={exp.company}
                         onChange={(e) => updateExperience(index, 'company', e.target.value)}
-                        className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-text focus:outline-none focus:border-primary transition-colors font-semibold"
+                        className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-text focus:outline-none focus:border-primary transition-colors font-semibold"
                         placeholder="e.g. Stripe"
                       />
                     </div>
@@ -304,7 +312,7 @@ export function ResumeForm({ data, onDataChange, onLoadDemo }) {
                         type="text"
                         value={exp.role}
                         onChange={(e) => updateExperience(index, 'role', e.target.value)}
-                        className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-text focus:outline-none focus:border-primary transition-colors font-semibold"
+                        className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-text focus:outline-none focus:border-primary transition-colors font-semibold"
                         placeholder="e.g. Senior Architect"
                       />
                     </div>
@@ -314,7 +322,7 @@ export function ResumeForm({ data, onDataChange, onLoadDemo }) {
                         type="text"
                         value={exp.startDate}
                         onChange={(e) => updateExperience(index, 'startDate', e.target.value)}
-                        className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-text focus:outline-none focus:border-primary transition-colors font-semibold"
+                        className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-text focus:outline-none focus:border-primary transition-colors font-semibold"
                         placeholder="e.g. Jan 2023"
                       />
                     </div>
@@ -324,7 +332,7 @@ export function ResumeForm({ data, onDataChange, onLoadDemo }) {
                         type="text"
                         value={exp.endDate}
                         onChange={(e) => updateExperience(index, 'endDate', e.target.value)}
-                        className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-text focus:outline-none focus:border-primary transition-colors font-semibold"
+                        className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-text focus:outline-none focus:border-primary transition-colors font-semibold"
                         placeholder="e.g. Present"
                       />
                     </div>
@@ -334,7 +342,7 @@ export function ResumeForm({ data, onDataChange, onLoadDemo }) {
                         rows="3"
                         value={exp.description}
                         onChange={(e) => updateExperience(index, 'description', e.target.value)}
-                        className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-text focus:outline-none focus:border-primary transition-colors font-semibold resize-none leading-relaxed"
+                        className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-text focus:outline-none focus:border-primary transition-colors font-semibold resize-none leading-relaxed"
                         placeholder="• Spearheaded construction of core component libraries..."
                       />
                     </div>
@@ -380,7 +388,7 @@ export function ResumeForm({ data, onDataChange, onLoadDemo }) {
                         type="text"
                         value={proj.projectName}
                         onChange={(e) => updateProject(index, 'projectName', e.target.value)}
-                        className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-text focus:outline-none focus:border-primary transition-colors font-semibold"
+                        className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-text focus:outline-none focus:border-primary transition-colors font-semibold"
                         placeholder="e.g. E-Commerce Core"
                       />
                     </div>
@@ -390,7 +398,7 @@ export function ResumeForm({ data, onDataChange, onLoadDemo }) {
                         type="text"
                         value={proj.techStack}
                         onChange={(e) => updateProject(index, 'techStack', e.target.value)}
-                        className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-text focus:outline-none focus:border-primary transition-colors font-semibold"
+                        className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-text focus:outline-none focus:border-primary transition-colors font-semibold"
                         placeholder="e.g. React, Next.js, Node.js"
                       />
                     </div>
@@ -400,7 +408,7 @@ export function ResumeForm({ data, onDataChange, onLoadDemo }) {
                         type="text"
                         value={proj.githubLink}
                         onChange={(e) => updateProject(index, 'githubLink', e.target.value)}
-                        className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-text focus:outline-none focus:border-primary transition-colors font-semibold"
+                        className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-text focus:outline-none focus:border-primary transition-colors font-semibold"
                         placeholder="e.g. https://github.com/user/project"
                       />
                     </div>
@@ -410,7 +418,7 @@ export function ResumeForm({ data, onDataChange, onLoadDemo }) {
                         rows="3.5"
                         value={proj.description}
                         onChange={(e) => updateProject(index, 'description', e.target.value)}
-                        className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-text focus:outline-none focus:border-primary transition-colors font-semibold resize-none leading-relaxed"
+                        className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-text focus:outline-none focus:border-primary transition-colors font-semibold resize-none leading-relaxed"
                         placeholder="Detail the challenges resolved and accomplishments..."
                       />
                     </div>
@@ -456,7 +464,7 @@ export function ResumeForm({ data, onDataChange, onLoadDemo }) {
                         type="text"
                         value={edu.college}
                         onChange={(e) => updateEducation(index, 'college', e.target.value)}
-                        className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-text focus:outline-none focus:border-primary transition-colors font-semibold"
+                        className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-text focus:outline-none focus:border-primary transition-colors font-semibold"
                         placeholder="e.g. Stanford University"
                       />
                     </div>
@@ -466,7 +474,7 @@ export function ResumeForm({ data, onDataChange, onLoadDemo }) {
                         type="text"
                         value={edu.degree}
                         onChange={(e) => updateEducation(index, 'degree', e.target.value)}
-                        className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-text focus:outline-none focus:border-primary transition-colors font-semibold"
+                        className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-text focus:outline-none focus:border-primary transition-colors font-semibold"
                         placeholder="e.g. Bachelor of Science in CS"
                       />
                     </div>
@@ -478,7 +486,7 @@ export function ResumeForm({ data, onDataChange, onLoadDemo }) {
                             type="text"
                             value={edu.startYear}
                             onChange={(e) => updateEducation(index, 'startYear', e.target.value)}
-                            className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-text focus:outline-none focus:border-primary transition-colors font-semibold text-center"
+                            className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-text focus:outline-none focus:border-primary transition-colors font-semibold text-center"
                             placeholder="e.g. 2016"
                           />
                         </div>
@@ -488,7 +496,7 @@ export function ResumeForm({ data, onDataChange, onLoadDemo }) {
                             type="text"
                             value={edu.endYear}
                             onChange={(e) => updateEducation(index, 'endYear', e.target.value)}
-                            className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-text focus:outline-none focus:border-primary transition-colors font-semibold text-center"
+                            className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-text focus:outline-none focus:border-primary transition-colors font-semibold text-center"
                             placeholder="e.g. 2020"
                           />
                         </div>

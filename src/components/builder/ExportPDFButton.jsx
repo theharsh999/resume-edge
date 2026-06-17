@@ -4,7 +4,7 @@ import { jsPDF } from 'jspdf';
 import { FileDown, Loader2 } from 'lucide-react';
 import { Button } from '../ui/Button';
 
-export function ExportPDFButton({ elementId, filename = 'resume.pdf', onSuccess }) {
+export function ExportPDFButton({ elementId, filename = 'resume.pdf', onSuccess, className = 'w-full h-11' }) {
   const [isExporting, setIsExporting] = useState(false);
 
   const handleExport = async () => {
@@ -60,7 +60,7 @@ export function ExportPDFButton({ elementId, filename = 'resume.pdf', onSuccess 
       onClick={handleExport}
       disabled={isExporting}
       variant="primary"
-      className="w-full h-11 shadow-premium-glow text-xs font-semibold gap-2 transition-all duration-300"
+      className={`${className} shadow-premium-glow text-xs font-semibold gap-2 transition-all duration-300`}
     >
       {isExporting ? (
         <>
