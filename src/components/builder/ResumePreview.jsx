@@ -406,7 +406,7 @@ export function ResumePreview({ data, template = 'modern' }) {
           </div>
         ) : (
           /* Renders template based on template state */
-          <div className="animate-fade-in">
+          <div id="resume-print-content" className="animate-fade-in bg-slate-900 rounded-xl">
             {template === 'modern' && <ModernTemplate />}
             {template === 'professional' && <ProfessionalTemplate />}
             {template === 'minimal' && <MinimalTemplate />}

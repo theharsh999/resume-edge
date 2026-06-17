@@ -6,6 +6,14 @@ import { Badge } from '../components/ui/Badge';
 import { TemplateSwitcher } from '../components/builder/TemplateSwitcher';
 import { ResumeForm } from '../components/builder/ResumeForm';
 import { ResumePreview } from '../components/builder/ResumePreview';
+
+// Analytics dashboard widgets
+import { ATSScoreCard } from '../components/builder/ATSScoreCard';
+import { ResumeInsights } from '../components/builder/ResumeInsights';
+import { CompletionTracker } from '../components/builder/CompletionTracker';
+import { RecruiterChecklist } from '../components/builder/RecruiterChecklist';
+import { ExportPDFButton } from '../components/builder/ExportPDFButton';
+
 import { Trash2, ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -96,7 +104,7 @@ export function Builder() {
     return saved || 'modern';
   });
 
-  // Sync to local storage
+  // Sync state to local storage
   useEffect(() => {
     localStorage.setItem(LOCAL_STORAGE_KEY_DATA, JSON.stringify(resumeData));
   }, [resumeData]);
@@ -115,6 +123,138 @@ export function Builder() {
     }
   };
 
+  // Programmatic calculations for builder analytics
+  const calculateATSScore = () => {
+    let score = 0;
+    const p = resumeData.personal || {};
+    
+    // Personal Info check: +15 max
+    if (p.fullName) score += 3;
+    if (p.email) score += 3;
+    if (p.phone) score += 3;
+    if (p.location) score += 2;
+    if (p.linkedin) score += 2;
+    if (p.github) score += 2;
+
+    // Summary statement check: +15 max
+    const summaryLen = (resumeData.summary || '').trim().length;
+    if (summaryLen >= 80) score += 15;
+    else if (summaryLen > 0) score += 10;
+
+    // Technical skills count: +20 max
+    const skillsCount = (resumeData.skills || []).length;
+    if (skillsCount >= 5) score += 20;
+    else if (skillsCount > 0) score += 10;
+
+    // Education details: +15 max
+    const eduCount = (resumeData.education || []).length;
+    if (eduCount >= 1) score += 15;
+
+    // Experience logs: +20 max
+    const expCount = (resumeData.experience || []).length;
+    if (expCount >= 2) score += 20;
+    else if (expCount === 1) score += 10;
+
+    // Projects showcases: +15 max
+    const projCount = (resumeData.projects || []).length;
+    if (projCount >= 2) score += 15;
+    else if (projCount === 1) score += 10;
+
+    return score;
+  };
+
+  const calculateCompletion = () => {
+    let total = 0;
+    const p = resumeData.personal || {};
+
+    // Personal details verification: max 30% (6 fields, each 5%)
+    if (p.fullName) total += 5;
+    if (p.role) total += 5;
+    if (p.email) total += 5;
+    if (p.phone) total += 5;
+    if (p.location) total += 5;
+    if (p.linkedin || p.github) total += 5;
+
+    // Summary validation: max 15%
+    if ((resumeData.summary || '').trim().length > 0) total += 15;
+
+    // Core Skills validation: max 15%
+    const skillsCount = (resumeData.skills || []).length;
+    if (skillsCount >= 5) total += 15;
+    else if (skillsCount > 0) total += 5;
+
+    // Work history validation: max 20%
+    if ((resumeData.experience || []).length >= 1) total += 20;
+
+    // Academic verification: max 10%
+    if ((resumeData.education || []).length >= 1) total += 10;
+
+    // Project entries validation: max 10%
+    if ((resumeData.projects || []).length >= 1) total += 10;
+
+    return total;
+  };
+
+  const getInsights = () => {
+    const list = [];
+    const p = resumeData.personal || {};
+
+    if (!p.email || !p.phone) {
+      list.push('Add contact details (email and phone) so recruiters can reach you.');
+    }
+    if (!p.linkedin) {
+      list.push('Add your LinkedIn URL link to build recruiter trust.');
+    }
+    if (!p.github) {
+      list.push('Link your GitHub profile to showcase open source contributions.');
+    }
+    if (!(resumeData.summary || '').trim()) {
+      list.push('Add a Professional Summary to summarize your career strengths.');
+    } else if (resumeData.summary.trim().length < 80) {
+      list.push('Expand your summary statement to be more descriptive (aim for 80+ chars).');
+    }
+    if ((resumeData.skills || []).length < 5) {
+      list.push('List at least 5 key technical skills to satisfy screening filters.');
+    }
+    if ((resumeData.experience || []).length === 0) {
+      list.push('Add your professional work history to showcase career growth.');
+    } else {
+      const shortDesc = resumeData.experience.some(exp => (exp.description || '').trim().length < 40);
+      if (shortDesc) {
+        list.push('Expand experience bullet points (explain your actions and metrics).');
+      }
+    }
+    if ((resumeData.education || []).length === 0) {
+      list.push('Add your education history (degrees or certification listings).');
+    }
+    if ((resumeData.projects || []).length === 0) {
+      list.push('Add at least one project entry to prove hands-on abilities.');
+    }
+
+    return list;
+  };
+
+  const getRecruiterChecklist = () => {
+    const p = resumeData.personal || {};
+    return [
+      { label: 'Full Name & Role Title', checked: !!(p.fullName && p.role) },
+      { label: 'Professional Summary Statement', checked: !!(resumeData.summary && resumeData.summary.trim().length > 0) },
+      { label: '5+ Core Skills Listed', checked: !!(resumeData.skills && resumeData.skills.length >= 5) },
+      { label: 'Work History Documented', checked: !!(resumeData.experience && resumeData.experience.length >= 1) },
+      { label: 'Academic History Documented', checked: !!(resumeData.education && resumeData.education.length >= 1) },
+      { label: 'Project Portfolio Present', checked: !!(resumeData.projects && resumeData.projects.length >= 1) },
+      { label: 'LinkedIn Profile Connected', checked: !!(p.linkedin && p.linkedin.trim().length > 0) },
+      { label: 'GitHub Profile Connected', checked: !!(p.github && p.github.trim().length > 0) },
+    ];
+  };
+
+  // Variable aggregates
+  const score = calculateATSScore();
+  const completion = calculateCompletion();
+  const insights = getInsights();
+  const checklist = getRecruiterChecklist();
+  const exportFilename = `ResumeEdge-${(resumeData.personal.fullName || 'Candidate').trim().replace(/\s+/g, '_')}.pdf`;
+
   return (
     <Layout>
       <Container className="py-8">
@@ -128,7 +268,7 @@ export function Builder() {
               <Badge variant="primary">Builder Workspace</Badge>
             </div>
             <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-text">Resume Workspace</h1>
-            <p className="text-muted text-xs md:text-sm font-medium">Build, preview, and customize your professional ATS resume in real time.</p>
+            <p className="text-muted text-xs md:text-sm font-medium">Build, check score, and export your optimized ATS resume in real time.</p>
           </div>
           <button
             onClick={handleClearAll}
@@ -139,10 +279,10 @@ export function Builder() {
           </button>
         </div>
 
-        {/* Layout split */}
+        {/* 3-Column Split Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          {/* Left Column: Form & Switcher (col-span-5) */}
-          <div className="lg:col-span-5 space-y-6">
+          {/* Column 1: Form & Switcher (col-span-4) */}
+          <div className="lg:col-span-4 space-y-6">
             <Card hoverEffect={false} className="p-4 md:p-5 border-slate-800 bg-surface/50">
               <TemplateSwitcher activeTemplate={template} onTemplateChange={setTemplate} />
             </Card>
@@ -150,9 +290,27 @@ export function Builder() {
             <ResumeForm data={resumeData} onDataChange={setResumeData} onLoadDemo={handleLoadDemo} />
           </div>
 
-          {/* Right Column: Live Sticky Preview (col-span-7) */}
-          <div className="lg:col-span-7 lg:sticky lg:top-24">
+          {/* Column 2: Live Sticky Preview (col-span-5) */}
+          <div className="lg:col-span-5 lg:sticky lg:top-24">
             <ResumePreview data={resumeData} template={template} />
+          </div>
+
+          {/* Column 3: Analytics Dashboard (col-span-3) */}
+          <div className="lg:col-span-3 lg:sticky lg:top-24 space-y-6">
+            {/* PDF export button wrapper */}
+            <ExportPDFButton elementId="resume-print-content" filename={exportFilename} />
+
+            {/* Score circle */}
+            <ATSScoreCard score={score} />
+
+            {/* Completion metrics */}
+            <CompletionTracker percentage={completion} />
+
+            {/* Checklist */}
+            <RecruiterChecklist checklist={checklist} />
+
+            {/* Insights recommendations list */}
+            <ResumeInsights insights={insights} />
           </div>
         </div>
       </Container>
