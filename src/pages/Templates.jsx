@@ -169,13 +169,13 @@ export function Templates() {
             <h1 className="text-3xl md:text-5xl font-bold tracking-tight text-text">
               Professional Resume Templates
             </h1>
-            <p className="text-muted text-base md:text-lg leading-relaxed">
+            <p className="text-muted text-base md:text-lg leading-relaxed font-semibold">
               Choose from a curated collection of recruiter-approved, ATS-friendly resume templates. Click any card to apply and open the editor.
             </p>
           </div>
 
-          {/* Grid of Templates */}
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 md:gap-10 mb-20">
+          {/* Grid of Templates (2 cards per row on Desktop and Tablet for larger previews, 1 on Mobile) */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 mb-20">
             {templates.map((template) => {
               // Custom primary colors per template
               const primaryColors = {
@@ -193,24 +193,26 @@ export function Templates() {
                 density: template.id === 'compact' ? 'compact' : 'balanced'
               };
 
+              const isActive = activeTemplate === template.id;
+
               return (
                 <div
                   key={template.id}
                   onClick={() => handleSelectTemplate(template.id)}
-                  className={`flex flex-col group rounded-2xl bg-surface/30 border transition-all duration-300 hover:shadow-premium-glow cursor-pointer relative overflow-hidden ${
-                    activeTemplate === template.id
-                      ? 'border-primary bg-primary/5 shadow-premium-glow ring-1 ring-primary/20'
-                      : 'border-slate-800 hover:border-slate-700/80'
+                  className={`flex flex-col group rounded-3xl bg-surface/30 border cursor-pointer relative overflow-hidden h-[630px] transition-all duration-300 ease-in-out hover:-translate-y-1.5 hover:scale-[1.01] ${
+                    isActive
+                      ? 'border-primary bg-primary/5 shadow-premium shadow-primary/10 ring-1 ring-primary/20'
+                      : 'border-slate-800 hover:border-slate-700/80 hover:shadow-2xl hover:shadow-primary/5'
                   }`}
                 >
-                  {/* Template Preview Section */}
-                  <div className="aspect-[3/4] w-full bg-slate-900 border-b border-slate-850 overflow-hidden relative group-hover:opacity-95 transition-all duration-300">
-                    {/* Scale actual ResumePreview down */}
+                  {/* Template Preview Section (71% of Card Height) */}
+                  <div className="h-[450px] w-full bg-slate-900 border-b border-slate-850 overflow-hidden relative transition-all duration-300 group-hover:opacity-95">
+                    {/* Scale actual ResumePreview down - scaled for readability */}
                     <div style={{
-                      transform: 'scale(0.25)',
+                      transform: 'scale(0.38)',
                       transformOrigin: 'top left',
-                      width: '400%',
-                      height: '400%',
+                      width: '263.15%', // 1 / 0.38
+                      height: '263.15%',
                       pointerEvents: 'none',
                       position: 'absolute',
                       top: 0,
@@ -224,25 +226,28 @@ export function Templates() {
                       />
                     </div>
 
-                    {/* Active Check Badge */}
-                    {activeTemplate === template.id && (
-                      <div className="absolute top-4 right-4 h-7 w-7 rounded-full bg-primary flex items-center justify-center shadow-lg border border-primary-light/25 z-10">
-                        <Check className="h-4 w-4 text-white" strokeWidth={3} />
+                    {/* Gradient Fade Overlay at the bottom of the preview */}
+                    <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-slate-900 to-transparent pointer-events-none z-10"></div>
+
+                    {/* Active Ribbon/Badge Indicator (Elegant & non-intrusive) */}
+                    {isActive && (
+                      <div className="absolute top-0 right-0 bg-gradient-to-r from-primary-dark to-primary text-white text-[10px] font-black uppercase tracking-wider py-1.5 px-5 rounded-bl-xl shadow-lg border-l border-b border-primary-light/25 z-20 animate-fade-in">
+                        Active Template
                       </div>
                     )}
                   </div>
 
-                  {/* Card Details */}
+                  {/* Card Details (29% of Card Height) */}
                   <div className="p-6 flex-grow flex flex-col justify-between space-y-4">
-                    <div className="text-left space-y-1.5">
+                    <div className="text-left space-y-1">
                       <div className="flex justify-between items-center gap-2">
-                        <h3 className="text-lg font-bold text-text group-hover:text-primary-light transition-colors duration-200">
+                        <h3 className="text-xl font-bold text-text group-hover:text-primary-light transition-colors duration-200">
                           {template.name}
                         </h3>
-                        {activeTemplate === template.id && (
+                        {isActive && (
                           <Badge
                             variant="success"
-                            className="text-[9px] py-0.5 px-2 bg-success/10 border-success/20 text-success flex items-center gap-1 font-bold tracking-wider"
+                            className="text-[9px] py-0.5 px-2 bg-success/15 border-success/35 text-success flex items-center gap-1 font-extrabold tracking-wider uppercase"
                           >
                             <span className="h-1.5 w-1.5 rounded-full bg-success animate-pulse" />
                             Active
@@ -262,7 +267,7 @@ export function Templates() {
                           <Badge
                             key={idx}
                             variant={isPopular ? 'primary' : isAts ? 'success' : 'muted'}
-                            className="text-[9px] py-0.5 px-2 font-bold tracking-wider uppercase"
+                            className="text-[9px] py-0.5 px-2.5 font-extrabold tracking-wider uppercase"
                           >
                             {tag}
                           </Badge>
