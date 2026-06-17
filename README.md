@@ -10,6 +10,7 @@ ResumeEdge is a premium SaaS-style ATS (Applicant Tracking System) Resume Builde
 * **Build Tool**: Vite
 * **Styling**: Tailwind CSS v4 (configured via modern `@theme` directive in CSS)
 * **Routing**: React Router DOM (v7)
+* **Drag and Drop**: @dnd-kit/core & @dnd-kit/sortable
 * **PDF Exporter**: html2canvas + jsPDF
 * **Icons**: Lucide React
 
@@ -22,9 +23,9 @@ resume-edge/
 ├── src/
 │   ├── assets/               # Brand and asset elements
 │   ├── components/
-│   │   ├── builder/          # Form, preview, switcher, accordion, score, insights, pdf export components
+│   │   ├── builder/          # Form, preview, switcher, accordion, settings, dnd lists
 │   │   ├── layout/           # Global structures (Navbar, Footer, Layout wrapper)
-│   │   └── ui/               # Reusable atomic UI elements (Button, Card, Badge, Container, Section)
+│   │   └── ui/               # Reusable atomic UI elements (Button, Card, Badge, Container, Section, Toast)
 │   ├── pages/                # Views (Home, Builder, Templates)
 │   ├── routes/               # Navigation definitions (index.jsx)
 │   ├── App.jsx               # Application entry point & router context
@@ -58,21 +59,36 @@ ResumeEdge runs a custom design system mapped in [src/index.css](file:///Users/h
 * **Features Grid (6 Cards)**: Showcases details for ATS Optimizations, Live Syncing, Layout templates, PDF downloads, responsiveness, and guided edit flows.
 * **Timeline Workflow**: Visual progression steps showing how to fill, select templates, and download outputs.
 
-### 2. Resume Builder Workspace (`/builder`)
+### 2. Advanced Templates Gallery (`/templates`)
+Showcases 6 designer-crafted, recruiter-approved formats:
+* **Modern Accent** (`modern`): Asymmetric grid structure with sidebar contact labels.
+* **Executive Classic** (`professional`): serif-centered layout with divider accents.
+* **Ultra Minimal** (`minimal`): Zero-margin single column grid.
+* **Creative Pro** (`creative`): Vertical color border highlights and custom pills.
+* **Executive Premium** (`executive`): Thick border divisions.
+* **Compact Fast** (`compact`): Max-density grids for single-page summaries.
+
+### 3. Resume Builder Workspace (`/builder`)
 * **3-Column Grid Dashboard**: Includes Form Editor, Live Canvas Preview, and Analytics Dashboard.
 * **Live Dynamic Preview**: Side-by-side split screen showing real-time rendering of your input.
 * **Collapsible Sections**: Uses an accordion system to group and structure inputs cleanly.
 * **Dynamic Input Lists**: Drag-free add and remove triggers for Experience, Projects, Education, and Skills tags.
-* **3 Stylized Templates**: Modern Accent, Executive Classic, and Ultra Minimal layouts.
 * **Demo Resume Loader**: One-click action to load pre-filled developer resume data.
 * **Local Storage Persistence**: Autosaver synchronizing data dynamically to survive browser refreshes.
 
-### 3. Resume Intelligence Dashboard (ATS Analyzer)
-* **ATS Score Card**: SVG progress ring counting score out of 100 based on core metrics. Adapts color (Red/Yellow/Green) to match compatibility.
+### 4. Custom Styling & Reordering
+* **Primary Color Themes**: Swaps themes instantly between Indigo, Blue, Emerald, Rose, and Amber.
+* **Typography**: Select between three clean fonts (Inter, Poppins, and Roboto).
+* **Spacing Density**: Adjust padding density between Comfortable, Balanced, and Compact.
+* **Drag-and-Drop Ordering**: Uses `@dnd-kit/sortable` to let users rearrange layout modules (`Summary`, `Skills`, `Experience`, `Projects`, `Education`) by dragging drag-handles.
+
+### 5. Resume Intelligence Dashboard (ATS Analyzer)
+* **ATS Score Card**: SVG progress ring counting score out of 100 based on core metrics.
 * **Completion Tracker**: Progressive indicator tracking completeness from 0% to 100%.
 * **Quality Insights**: Smart suggestions indicating missing credentials, short descriptors, or empty sections.
 * **Recruiter Checklist**: Roster listing recruiter standard checklists that tick off live as the user completes fields.
-* **PDF Direct Exporter**: Seamlessly captures the resume container, compiling a high-resolution print PDF saved as `ResumeEdge-[Candidate_Name].pdf`.
+* **PDF Direct Exporter**: Captures preview container, compiling a high-resolution print PDF saved as `ResumeEdge-[Candidate_Name].pdf`.
+* **Toast Alerts**: Micro-interactions giving action updates ("Template applied successfully!", "Styling settings updated!", etc.).
 
 ## 🛠️ Getting Started
 
