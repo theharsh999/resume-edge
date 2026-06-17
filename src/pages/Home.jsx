@@ -85,7 +85,7 @@ export function Home() {
   return (
     <Layout>
       {/* Hero Section */}
-      <Section className="pt-16 pb-12 md:pt-24 md:pb-16 text-center">
+      <Section className="pt-20 pb-16 md:pt-32 md:pb-24 text-center">
         <Container className="space-y-6 max-w-4xl">
           <Badge variant="primary" className="mb-2">
             <Sparkles className="h-3.5 w-3.5 mr-1 text-primary-light inline-block animate-pulse" />
@@ -139,7 +139,7 @@ export function Home() {
       </Section>
 
       {/* Resume Preview Showcase (HTML/CSS Split Mockup) */}
-      <Section className="py-12 md:py-16 bg-slate-950/20">
+      <Section className="py-20 md:py-28 bg-slate-950/20">
         <Container>
           <div className="text-center max-w-2xl mx-auto mb-12">
             <Badge variant="secondary" className="mb-3">Interactive Demo</Badge>
@@ -149,7 +149,7 @@ export function Home() {
             </p>
           </div>
 
-          <Card className="max-w-5xl mx-auto p-2 md:p-4 bg-slate-900/40 border-slate-800 shadow-2xl relative overflow-hidden" hoverEffect={false}>
+          <Card className="max-w-5xl mx-auto p-4 md:p-6 rounded-2xl bg-slate-900/40 border-slate-800 shadow-[0_20px_50px_rgba(0,0,0,0.5)] relative overflow-hidden" hoverEffect={false}>
             {/* Visual glow backdrops */}
             <div className="absolute -top-40 -left-40 h-80 w-80 rounded-full bg-primary/10 blur-3xl pointer-events-none"></div>
             <div className="absolute -bottom-40 -right-40 h-80 w-80 rounded-full bg-secondary/10 blur-3xl pointer-events-none"></div>
@@ -414,7 +414,7 @@ export function Home() {
       </Section>
 
       {/* Features Section (6 Cards Grid) */}
-      <Section className="border-t border-slate-900/60">
+      <Section className="border-t border-slate-900/60 py-20 md:py-28 lg:py-32">
         <Container>
           <div className="text-center max-w-2xl mx-auto mb-16 space-y-3">
             <Badge variant="secondary">Core Capabilities</Badge>
@@ -428,7 +428,7 @@ export function Home() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {features.map((feat, idx) => (
-              <Card key={idx} className="flex flex-col text-left group" hoverEffect={true}>
+              <Card key={idx} className="flex flex-col text-left group p-8 rounded-2xl" hoverEffect={true}>
                 <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 border border-primary/20 text-primary-light mb-5 group-hover:scale-110 transition-transform duration-300">
                   {feat.icon}
                 </div>
@@ -445,7 +445,7 @@ export function Home() {
       </Section>
 
       {/* How It Works Section (Horizontal Timeline on Desktop) */}
-      <Section className="border-t border-slate-900/60 bg-slate-950/10">
+      <Section className="border-t border-slate-900/60 bg-slate-950/10 py-20 md:py-28 lg:py-32">
         <Container>
           <div className="text-center max-w-2xl mx-auto mb-16 space-y-3">
             <Badge variant="primary">Workflow</Badge>
@@ -486,7 +486,7 @@ export function Home() {
       </Section>
 
       {/* Stats Section */}
-      <Section className="border-t border-slate-900/60 bg-slate-950/20 py-12 md:py-16">
+      <Section className="border-t border-slate-900/60 bg-slate-950/20 py-16 md:py-24">
         <Container>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
             <div className="text-center space-y-1">
@@ -518,9 +518,9 @@ export function Home() {
       </Section>
 
       {/* CTA Section */}
-      <Section className="border-t border-slate-900/60 py-16 text-center">
+      <Section className="border-t border-slate-900/60 py-24 md:py-32 text-center">
         <Container>
-          <Card className="max-w-4xl mx-auto py-12 px-6 md:py-20 md:px-12 bg-gradient-to-br from-slate-900/40 via-surface to-slate-950/60 border-slate-800 shadow-2xl relative overflow-hidden" hoverEffect={false}>
+          <Card className="max-w-4xl mx-auto py-16 px-8 md:py-24 md:px-16 rounded-3xl bg-gradient-to-br from-slate-900/40 via-surface to-slate-950/60 border-slate-800 shadow-[0_20px_50px_rgba(0,0,0,0.5)] relative overflow-hidden" hoverEffect={false}>
             {/* Ambient light effects */}
             <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(99,102,241,0.05),transparent_60%)] pointer-events-none"></div>
 

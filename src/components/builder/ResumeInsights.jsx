@@ -3,7 +3,7 @@ import { AlertCircle, CheckCircle2 } from 'lucide-react';
 
 export function ResumeInsights({ insights = [] }) {
   return (
-    <div className="flex flex-col p-5 rounded-xl border border-slate-800 bg-surface/40 text-left space-y-3">
+    <div className="flex flex-col p-6 rounded-2xl border border-slate-800 bg-surface/40 text-left space-y-3 shadow-sm">
       <h3 className="text-xs font-bold text-text uppercase tracking-wider">Quality Insights</h3>
       
       {insights.length > 0 ? (

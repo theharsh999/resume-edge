@@ -61,7 +61,7 @@ export function ATSScoreCard({ score = 0 }) {
   const strokeDashoffset = circumference - (animatedScore / 100) * circumference;
 
   return (
-    <div className="flex flex-col items-center p-5 rounded-xl border border-slate-800 bg-surface/40 text-center space-y-4">
+    <div className="flex flex-col items-center p-6 rounded-2xl border border-slate-800 bg-surface/40 text-center space-y-4 shadow-sm">
       <div className="text-left w-full">
         <h3 className="text-xs font-bold text-text uppercase tracking-wider">ATS Score</h3>
       </div>

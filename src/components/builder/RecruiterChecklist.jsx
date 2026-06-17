@@ -3,7 +3,7 @@ import { Check, X } from 'lucide-react';
 
 export function RecruiterChecklist({ checklist = [] }) {
   return (
-    <div className="flex flex-col p-5 rounded-xl border border-slate-800 bg-surface/40 text-left space-y-3">
+    <div className="flex flex-col p-6 rounded-2xl border border-slate-800 bg-surface/40 text-left space-y-3 shadow-sm">
       <h3 className="text-xs font-bold text-text uppercase tracking-wider">Recruiter Checklist</h3>
       
       <ul className="space-y-2.5">

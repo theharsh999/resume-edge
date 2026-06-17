@@ -2,7 +2,7 @@ import React from 'react';
 
 export function CompletionTracker({ percentage = 0 }) {
   return (
-    <div className="flex flex-col p-5 rounded-xl border border-slate-800 bg-surface/40 text-left space-y-3">
+    <div className="flex flex-col p-6 rounded-2xl border border-slate-800 bg-surface/40 text-left space-y-3 shadow-sm">
       <div className="flex justify-between items-baseline">
         <h3 className="text-xs font-bold text-text uppercase tracking-wider">Completion Tracker</h3>
         <span className="text-xs font-extrabold text-primary-light">{percentage}%</span>
