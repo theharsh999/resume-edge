@@ -7,6 +7,11 @@ import { TemplateSwitcher } from '../components/builder/TemplateSwitcher';
 import { ResumeForm } from '../components/builder/ResumeForm';
 import { ResumePreview } from '../components/builder/ResumePreview';
 
+// Customization and Ordering Panels
+import { ResumeSettings } from '../components/builder/ResumeSettings';
+import { SectionDndList } from '../components/builder/SectionDndList';
+import { Toast } from '../components/ui/Toast';
+
 // Analytics dashboard widgets
 import { ATSScoreCard } from '../components/builder/ATSScoreCard';
 import { ResumeInsights } from '../components/builder/ResumeInsights';
@@ -19,6 +24,9 @@ import { Link } from 'react-router-dom';
 
 const LOCAL_STORAGE_KEY_DATA = 'resumeedge_data';
 const LOCAL_STORAGE_KEY_TPL = 'resumeedge_template';
+const LOCAL_STORAGE_KEY_SETTINGS = 'resumeedge_settings';
+const LOCAL_STORAGE_KEY_ORDER = 'resumeedge_section_order';
+const LOCAL_STORAGE_KEY_PENDING_TOAST = 'resumeedge_pending_toast';
 
 const defaultState = {
   personal: {
@@ -36,6 +44,14 @@ const defaultState = {
   education: [],
   projects: []
 };
+
+const defaultSettings = {
+  primaryColor: 'indigo',
+  fontFamily: 'Inter',
+  density: 'balanced'
+};
+
+const defaultOrder = ['summary', 'skills', 'experience', 'projects', 'education'];
 
 const demoResumeData = {
   personal: {
@@ -104,7 +120,51 @@ export function Builder() {
     return saved || 'modern';
   });
 
-  // Sync state to local storage
+  const [settings, setSettings] = useState(() => {
+    try {
+      const saved = localStorage.getItem(LOCAL_STORAGE_KEY_SETTINGS);
+      return saved ? JSON.parse(saved) : defaultSettings;
+    } catch {
+      return defaultSettings;
+    }
+  });
+
+  const [sectionOrder, setSectionOrder] = useState(() => {
+    try {
+      const saved = localStorage.getItem(LOCAL_STORAGE_KEY_ORDER);
+      return saved ? JSON.parse(saved) : defaultOrder;
+    } catch {
+      return defaultOrder;
+    }
+  });
+
+  // Toasts state management
+  const [toasts, setToasts] = useState([]);
+
+  const addToast = (message, type = 'success') => {
+    const id = Date.now();
+    setToasts((prev) => [...prev, { id, message, type }]);
+  };
+
+  const dismissToast = (id) => {
+    setToasts((prev) => prev.filter((t) => t.id !== id));
+  };
+
+  // Check pending toast on mount
+  useEffect(() => {
+    try {
+      const pending = localStorage.getItem(LOCAL_STORAGE_KEY_PENDING_TOAST);
+      if (pending) {
+        const parsed = JSON.parse(pending);
+        addToast(parsed.message, parsed.type);
+        localStorage.removeItem(LOCAL_STORAGE_KEY_PENDING_TOAST);
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  }, []);
+
+  // Sync state variables to local storage
   useEffect(() => {
     localStorage.setItem(LOCAL_STORAGE_KEY_DATA, JSON.stringify(resumeData));
   }, [resumeData]);
@@ -113,13 +173,41 @@ export function Builder() {
     localStorage.setItem(LOCAL_STORAGE_KEY_TPL, template);
   }, [template]);
 
+  useEffect(() => {
+    localStorage.setItem(LOCAL_STORAGE_KEY_SETTINGS, JSON.stringify(settings));
+  }, [settings]);
+
+  useEffect(() => {
+    localStorage.setItem(LOCAL_STORAGE_KEY_ORDER, JSON.stringify(sectionOrder));
+  }, [sectionOrder]);
+
+  const handleTemplateChange = (newTpl) => {
+    setTemplate(newTpl);
+    addToast('Template style applied!', 'success');
+  };
+
+  const handleSettingsChange = (newSettings) => {
+    setSettings(newSettings);
+    addToast('Styling settings updated!', 'success');
+  };
+
+  const handleReorderSections = (newOrder) => {
+    setSectionOrder(newOrder);
+    addToast('Layout sections rearranged!', 'success');
+  };
+
   const handleLoadDemo = () => {
     setResumeData(demoResumeData);
+    addToast('Demo developer resume loaded!', 'info');
   };
 
   const handleClearAll = () => {
     if (window.confirm('Are you sure you want to clear all resume information?')) {
       setResumeData(defaultState);
+      setTemplate('modern');
+      setSettings(defaultSettings);
+      setSectionOrder(defaultOrder);
+      addToast('Workspace data cleared!', 'info');
     }
   };
 
@@ -268,7 +356,7 @@ export function Builder() {
               <Badge variant="primary">Builder Workspace</Badge>
             </div>
             <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-text">Resume Workspace</h1>
-            <p className="text-muted text-xs md:text-sm font-medium">Build, check score, and export your optimized ATS resume in real time.</p>
+            <p className="text-muted text-xs md:text-sm font-medium">Build, check score, customize styling themes, and export A4 PDFs in real time.</p>
           </div>
           <button
             onClick={handleClearAll}
@@ -281,10 +369,16 @@ export function Builder() {
 
         {/* 3-Column Split Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          {/* Column 1: Form & Switcher (col-span-4) */}
+          {/* Column 1: Form & Customization Switchers (col-span-4) */}
           <div className="lg:col-span-4 space-y-6">
-            <Card hoverEffect={false} className="p-4 md:p-5 border-slate-800 bg-surface/50">
-              <TemplateSwitcher activeTemplate={template} onTemplateChange={setTemplate} />
+            <Card hoverEffect={false} className="p-4 md:p-5 border-slate-800 bg-surface/50 space-y-4">
+              <TemplateSwitcher activeTemplate={template} onTemplateChange={handleTemplateChange} />
+              
+              {/* Styling settings selector accordion */}
+              <ResumeSettings settings={settings} onSettingsChange={handleSettingsChange} />
+
+              {/* Drag and Drop layout sortable list */}
+              <SectionDndList items={sectionOrder} onReorder={handleReorderSections} />
             </Card>
 
             <ResumeForm data={resumeData} onDataChange={setResumeData} onLoadDemo={handleLoadDemo} />
@@ -292,13 +386,17 @@ export function Builder() {
 
           {/* Column 2: Live Sticky Preview (col-span-5) */}
           <div className="lg:col-span-5 lg:sticky lg:top-24">
-            <ResumePreview data={resumeData} template={template} />
+            <ResumePreview data={resumeData} template={template} settings={settings} sectionOrder={sectionOrder} />
           </div>
 
           {/* Column 3: Analytics Dashboard (col-span-3) */}
           <div className="lg:col-span-3 lg:sticky lg:top-24 space-y-6">
             {/* PDF export button wrapper */}
-            <ExportPDFButton elementId="resume-print-content" filename={exportFilename} />
+            <ExportPDFButton 
+              elementId="resume-print-content" 
+              filename={exportFilename} 
+              onSuccess={() => addToast('Resume PDF downloaded!', 'success')}
+            />
 
             {/* Score circle */}
             <ATSScoreCard score={score} />
@@ -314,6 +412,9 @@ export function Builder() {
           </div>
         </div>
       </Container>
+
+      {/* Floating Toast Notification alerts overlay */}
+      <Toast toasts={toasts} onDismiss={dismissToast} />
     </Layout>
   );
 }

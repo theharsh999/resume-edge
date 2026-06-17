@@ -4,7 +4,7 @@ import { jsPDF } from 'jspdf';
 import { FileDown, Loader2 } from 'lucide-react';
 import { Button } from '../ui/Button';
 
-export function ExportPDFButton({ elementId, filename = 'resume.pdf' }) {
+export function ExportPDFButton({ elementId, filename = 'resume.pdf', onSuccess }) {
   const [isExporting, setIsExporting] = useState(false);
 
   const handleExport = async () => {
@@ -43,6 +43,10 @@ export function ExportPDFButton({ elementId, filename = 'resume.pdf' }) {
 
       pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
       pdf.save(filename);
+
+      if (onSuccess) {
+        onSuccess();
+      }
     } catch (err) {
       console.error('Failed to generate PDF:', err);
       alert('Could not compile PDF document. Please try again.');
