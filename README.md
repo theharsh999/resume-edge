@@ -21,6 +21,7 @@ resume-edge/
 ├── src/
 │   ├── assets/               # Brand and asset elements
 │   ├── components/
+│   │   ├── builder/          # Form, preview, switcher, accordion components
 │   │   ├── layout/           # Global structures (Navbar, Footer, Layout wrapper)
 │   │   └── ui/               # Reusable atomic UI elements (Button, Card, Badge, Container, Section)
 │   ├── pages/                # Views (Home, Builder, Templates)
@@ -48,14 +49,24 @@ ResumeEdge runs a custom design system mapped in [src/index.css](file:///Users/h
 * **Success**: `#22C55E` (Green-500)
 * **Typography**: Inter (Google Fonts)
 
-## 🏠 Landing Page Features
+## 🏠 Key Product Features
 
-Our homepage includes a high-end product presentation:
+### 1. Landing Page
 * **Hero Section**: Strong ATS marketing tags and trust badges highlighting compliance.
 * **Interactive Resume Preview**: A mock editor side-by-side with a preview sheet. Type in the form fields and toggle between **Modern** and **Classic** designs to witness real-time layout rendering.
 * **Features Grid (6 Cards)**: Showcases details for ATS Optimizations, Live Syncing, Layout templates, PDF downloads, responsiveness, and guided edit flows.
 * **Timeline Workflow**: Visual progression steps showing how to fill, select templates, and download outputs.
-* **Milestones Stats**: Professional user review metrics.
+
+### 2. Resume Builder Workspace (`/builder`)
+* **Live Dynamic Preview**: Side-by-side split screen showing real-time rendering of your input.
+* **Collapsible Sections**: Uses an accordion system to group and structure inputs cleanly.
+* **Dynamic Input Lists**: Drag-free add and remove triggers for Experience, Projects, Education, and Skills tags.
+* **3 Stylized Templates**:
+  * **Modern Accent**: Asymmetric colored layout.
+  * **Executive Classic**: Formal centered typography style.
+  * **Ultra Minimal**: Compact grids for optimized spacing.
+* **Demo Resume Loader**: One-click action to load pre-filled developer resume data.
+* **Local Storage Persistence**: Autosaver synchronizing data dynamically to survive browser refreshes.
 
 ## 🛠️ Getting Started
 
