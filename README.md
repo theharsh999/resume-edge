@@ -8,7 +8,7 @@ ResumeEdge is a premium SaaS-style ATS (Applicant Tracking System) Resume Builde
 
 * **Frontend**: React.js (JavaScript)
 * **Build Tool**: Vite
-* **Styling**: Tailwind CSS v4 (configured via modern `@theme` directive)
+* **Styling**: Tailwind CSS v4 (configured via modern `@theme` directive in CSS)
 * **Routing**: React Router DOM (v7)
 * **Icons**: Lucide React
 
@@ -48,6 +48,15 @@ ResumeEdge runs a custom design system mapped in [src/index.css](file:///Users/h
 * **Success**: `#22C55E` (Green-500)
 * **Typography**: Inter (Google Fonts)
 
+## 🏠 Landing Page Features
+
+Our homepage includes a high-end product presentation:
+* **Hero Section**: Strong ATS marketing tags and trust badges highlighting compliance.
+* **Interactive Resume Preview**: A mock editor side-by-side with a preview sheet. Type in the form fields and toggle between **Modern** and **Classic** designs to witness real-time layout rendering.
+* **Features Grid (6 Cards)**: Showcases details for ATS Optimizations, Live Syncing, Layout templates, PDF downloads, responsiveness, and guided edit flows.
+* **Timeline Workflow**: Visual progression steps showing how to fill, select templates, and download outputs.
+* **Milestones Stats**: Professional user review metrics.
+
 ## 🛠️ Getting Started
 
 ### Installation
@@ -73,11 +82,3 @@ Compile production-ready minimized bundles:
 ```bash
 npm run build
 ```
-
-## 🧱 Reusable UI Components
-
-* **Container**: Standardizes width margins across viewport screens (max 7xl with default side paddings).
-* **Section**: Sets vertical padding spaces (`py-12` up to `py-28`) for layouts.
-* **Button**: Supports multiple variants (`primary`, `secondary`, `outline`, `ghost`, `success`), sizing, and interactive scale micro-animations.
-* **Card**: A clean slate-900 surface with custom-designed borders, glow gradients, and hover highlights.
-* **Badge**: Standardized pill labels for category classification or scoring indicators.
