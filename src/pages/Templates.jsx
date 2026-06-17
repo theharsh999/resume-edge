@@ -1,43 +1,22 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { Layout } from '../components/layout/Layout';
 import { Container } from '../components/ui/Container';
 import { Section } from '../components/ui/Section';
 import { Badge } from '../components/ui/Badge';
 import { Toast } from '../components/ui/Toast';
-import { FileUp, FileText, Check, Trash2 } from 'lucide-react';
+import { Check } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { ResumePreview } from '../components/builder/ResumePreview';
 import { demoResumeData, defaultSettings, defaultOrder } from './Builder';
 
 const LOCAL_STORAGE_KEY_TPL = 'resumeedge_template';
 const LOCAL_STORAGE_KEY_TOAST = 'resumeedge_pending_toast';
-const LOCAL_STORAGE_KEY_IMPORTED_FILE = 'resumeedge_imported_file';
-
-function formatBytes(bytes) {
-  if (bytes === 0) return '0 Bytes';
-  const k = 1024;
-  const sizes = ['Bytes', 'KB', 'MB'];
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
-}
 
 export function Templates() {
   const navigate = useNavigate();
-  const fileInputRef = useRef(null);
   const [activeTemplate, setActiveTemplate] = useState(() => {
     return localStorage.getItem(LOCAL_STORAGE_KEY_TPL) || 'modern';
   });
-  
-  const [importedFile, setImportedFile] = useState(() => {
-    try {
-      const saved = localStorage.getItem(LOCAL_STORAGE_KEY_IMPORTED_FILE);
-      return saved ? JSON.parse(saved) : null;
-    } catch {
-      return null;
-    }
-  });
-
-  const [isDragging, setIsDragging] = useState(false);
   const [toasts, setToasts] = useState([]);
 
   const addToast = (message, type = 'success') => {
@@ -96,69 +75,6 @@ export function Templates() {
     setTimeout(() => navigate('/builder'), 800);
   };
 
-  // Drag and Drop Handlers
-  const handleDragOver = (e) => {
-    e.preventDefault();
-    setIsDragging(true);
-  };
-
-  const handleDragLeave = () => {
-    setIsDragging(false);
-  };
-
-  const handleDrop = (e) => {
-    e.preventDefault();
-    setIsDragging(false);
-    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-      processFile(e.dataTransfer.files[0]);
-    }
-  };
-
-  const handleFileChange = (e) => {
-    if (e.target.files && e.target.files.length > 0) {
-      processFile(e.target.files[0]);
-    }
-  };
-
-  const processFile = (file) => {
-    const ext = file.name.split('.').pop().toLowerCase();
-    const validExtensions = ['pdf', 'docx'];
-    
-    if (!validExtensions.includes(ext)) {
-      addToast('Invalid file format. Please upload a PDF or DOCX resume.', 'warning');
-      return;
-    }
-
-    const fileRef = {
-      name: file.name,
-      size: file.size,
-      type: file.type || (ext === 'pdf' ? 'application/pdf' : 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'),
-      uploadedAt: new Date().toISOString()
-    };
-
-    try {
-      localStorage.setItem(LOCAL_STORAGE_KEY_IMPORTED_FILE, JSON.stringify(fileRef));
-      setImportedFile(fileRef);
-      addToast(`"${file.name}" imported successfully!`, 'success');
-    } catch (err) {
-      console.error('Failed to save file reference:', err);
-      addToast('Failed to save file reference.', 'warning');
-    }
-  };
-
-  const handleRemoveFile = (e) => {
-    e.stopPropagation();
-    localStorage.removeItem(LOCAL_STORAGE_KEY_IMPORTED_FILE);
-    setImportedFile(null);
-    addToast('Imported resume reference unlinked.', 'info');
-  };
-
-  const triggerFileSelect = () => {
-    if (fileInputRef.current) {
-      fileInputRef.current.click();
-    }
-  };
-
   return (
     <Layout>
       <Container>
@@ -174,8 +90,8 @@ export function Templates() {
             </p>
           </div>
 
-          {/* Grid of Templates (2 cards per row on Desktop and Tablet for larger previews, 1 on Mobile) */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 mb-20">
+          {/* Grid of Templates (3 columns desktop, 2 columns tablet, 1 column mobile) */}
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 md:gap-10 mb-16">
             {templates.map((template) => {
               // Custom primary colors per template
               const primaryColors = {
@@ -199,35 +115,35 @@ export function Templates() {
                 <div
                   key={template.id}
                   onClick={() => handleSelectTemplate(template.id)}
-                  className={`flex flex-col group rounded-3xl bg-surface/30 border cursor-pointer relative overflow-hidden h-[630px] transition-all duration-300 ease-in-out hover:-translate-y-1.5 hover:scale-[1.01] ${
+                  className={`flex flex-col group rounded-3xl bg-surface/30 border cursor-pointer relative overflow-hidden h-[600px] transition-all duration-300 ease-in-out hover:-translate-y-1.5 hover:scale-[1.01] ${
                     isActive
                       ? 'border-primary bg-primary/5 shadow-premium shadow-primary/10 ring-1 ring-primary/20'
                       : 'border-slate-800 hover:border-slate-700/80 hover:shadow-2xl hover:shadow-primary/5'
                   }`}
                 >
-                  {/* Template Preview Section (71% of Card Height) */}
-                  <div className="h-[450px] w-full bg-slate-900 border-b border-slate-850 overflow-hidden relative transition-all duration-300 group-hover:opacity-95">
-                    {/* Scale actual ResumePreview down - scaled for readability */}
-                    <div style={{
-                      transform: 'scale(0.38)',
-                      transformOrigin: 'top left',
-                      width: '263.15%', // 1 / 0.38
-                      height: '263.15%',
-                      pointerEvents: 'none',
-                      position: 'absolute',
-                      top: 0,
-                      left: 0,
-                    }}>
-                      <ResumePreview 
-                        data={demoResumeData} 
-                        template={template.id} 
-                        settings={templateSettings} 
-                        sectionOrder={defaultOrder} 
-                      />
+                  {/* Template Preview Section (73% of Card Height, centered A4 sheet) */}
+                  <div className="h-[440px] w-full bg-slate-950/45 border-b border-slate-850 flex items-center justify-center p-4 overflow-hidden relative transition-all duration-300 group-hover:opacity-95">
+                    {/* Centered A4 Page Mockup */}
+                    <div className="w-[270px] h-[380px] bg-white rounded-lg shadow-2xl overflow-hidden relative border border-slate-200 shrink-0">
+                      {/* Scaled ResumePreview inside the sheet */}
+                      <div style={{
+                        transform: 'scale(0.32)',
+                        transformOrigin: 'top left',
+                        width: '312.5%', // 1 / 0.32
+                        height: '312.5%',
+                        pointerEvents: 'none',
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                      }}>
+                        <ResumePreview 
+                          data={demoResumeData} 
+                          template={template.id} 
+                          settings={templateSettings} 
+                          sectionOrder={defaultOrder} 
+                        />
+                      </div>
                     </div>
-
-                    {/* Gradient Fade Overlay at the bottom of the preview */}
-                    <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-slate-900 to-transparent pointer-events-none z-10"></div>
 
                     {/* Active Ribbon/Badge Indicator (Elegant & non-intrusive) */}
                     {isActive && (
@@ -237,17 +153,17 @@ export function Templates() {
                     )}
                   </div>
 
-                  {/* Card Details (29% of Card Height) */}
+                  {/* Card Details (27% of Card Height) */}
                   <div className="p-6 flex-grow flex flex-col justify-between space-y-4">
                     <div className="text-left space-y-1">
                       <div className="flex justify-between items-center gap-2">
-                        <h3 className="text-xl font-bold text-text group-hover:text-primary-light transition-colors duration-200">
+                        <h3 className="text-lg font-bold text-text group-hover:text-primary-light transition-colors duration-200">
                           {template.name}
                         </h3>
                         {isActive && (
                           <Badge
                             variant="success"
-                            className="text-[9px] py-0.5 px-2 bg-success/15 border-success/35 text-success flex items-center gap-1 font-extrabold tracking-wider uppercase"
+                            className="text-[9px] py-0.5 px-2 bg-success/15 border-success/35 text-success flex items-center gap-1 font-extrabold tracking-wider uppercase animate-fade-in"
                           >
                             <span className="h-1.5 w-1.5 rounded-full bg-success animate-pulse" />
                             Active
@@ -278,90 +194,6 @@ export function Templates() {
                 </div>
               );
             })}
-          </div>
-
-          {/* Interactive Resume Import Area */}
-          <div className="max-w-3xl mx-auto space-y-6">
-            <div className="text-left">
-              <h2 className="text-xl font-bold tracking-tight text-text">Resume Import Control</h2>
-              <p className="text-xs text-muted">Upload and reference your current documents inside browser storage.</p>
-            </div>
-
-            {importedFile ? (
-              /* Active Linked File View */
-              <div className="border border-slate-800 bg-surface/30 rounded-2xl p-6 flex flex-col md:flex-row items-center justify-between gap-4 text-left shadow-2xl relative overflow-hidden animate-fade-in">
-                <div className="absolute -top-10 -left-10 h-24 w-24 rounded-full bg-success/5 blur-2xl pointer-events-none"></div>
-                <div className="flex items-center gap-4 w-full md:w-auto">
-                  <div className="h-12 w-12 rounded-xl bg-success/10 border border-success/20 flex items-center justify-center shrink-0">
-                    <FileText className="h-6 w-6 text-success" />
-                  </div>
-                  <div className="min-w-0">
-                    <span className="font-bold text-text text-sm block truncate max-w-xs md:max-w-md">
-                      {importedFile.name}
-                    </span>
-                    <span className="text-[11px] text-muted font-semibold mt-0.5 block">
-                      {formatBytes(importedFile.size)} • Imported {new Date(importedFile.uploadedAt).toLocaleDateString()}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-3 w-full md:w-auto justify-end">
-                  <Badge variant="success" className="bg-success/10 border-success/20 text-success text-[10px] py-1 px-3.5 font-bold uppercase tracking-wider shrink-0 flex items-center gap-1.5">
-                    <span className="h-1.5 w-1.5 rounded-full bg-success animate-pulse" />
-                    File Linked
-                  </Badge>
-                  <button
-                    onClick={handleRemoveFile}
-                    type="button"
-                    className="flex items-center justify-center gap-1.5 text-xs font-bold text-red-400 hover:text-red-300 transition-colors border border-red-500/10 hover:border-red-500/20 bg-red-950/10 px-3 py-2 rounded-xl cursor-pointer"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                    Unlink
-                  </button>
-                </div>
-              </div>
-            ) : (
-              /* Drag & Drop Upload Zone */
-              <div
-                onDragOver={handleDragOver}
-                onDragLeave={handleDragLeave}
-                onDrop={handleDrop}
-                onClick={triggerFileSelect}
-                className={`border-2 border-dashed rounded-2xl p-10 text-center cursor-pointer transition-all duration-300 flex flex-col items-center justify-center space-y-4 group relative overflow-hidden ${
-                  isDragging
-                    ? 'border-primary bg-primary/5 shadow-premium-glow'
-                    : 'border-slate-800 hover:border-slate-700/80 bg-surface/10 hover:bg-surface/20'
-                }`}
-              >
-                <input
-                  type="file"
-                  ref={fileInputRef}
-                  onChange={handleFileChange}
-                  accept=".pdf,.docx"
-                  className="hidden"
-                />
-
-                <div className={`h-12 w-12 rounded-xl flex items-center justify-center transition-all duration-300 ${
-                  isDragging ? 'bg-primary/20 text-primary-light' : 'bg-slate-900 text-muted group-hover:text-text border border-slate-800'
-                }`}>
-                  <FileUp className="h-6 w-6" />
-                </div>
-
-                <div className="space-y-1.5">
-                  <h3 className="text-base font-bold text-text group-hover:text-primary-light transition-colors duration-200">
-                    Import Existing Resume
-                  </h3>
-                  <p className="text-xs text-muted max-w-sm mx-auto leading-relaxed font-semibold">
-                    Drag and drop your PDF or DOCX file here, or <span className="text-primary-light hover:underline font-bold">browse folders</span> to link local file reference.
-                  </p>
-                </div>
-
-                <div className="flex gap-2 justify-center pt-2">
-                  <Badge variant="muted" className="text-[9px] font-extrabold uppercase py-0.5 px-2 bg-slate-900 border-slate-800 text-slate-400">PDF</Badge>
-                  <Badge variant="muted" className="text-[9px] font-extrabold uppercase py-0.5 px-2 bg-slate-900 border-slate-800 text-slate-400">DOCX</Badge>
-                </div>
-              </div>
-            )}
           </div>
         </Section>
       </Container>

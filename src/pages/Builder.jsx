@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Layout } from '../components/layout/Layout';
 import { Container } from '../components/ui/Container';
 import { Badge } from '../components/ui/Badge';
@@ -13,7 +13,7 @@ import { CompletionTracker } from '../components/builder/CompletionTracker';
 import { RecruiterChecklist } from '../components/builder/RecruiterChecklist';
 import { ExportPDFButton } from '../components/builder/ExportPDFButton';
 
-import { Trash2, ArrowLeft, Sparkles } from 'lucide-react';
+import { Trash2, ArrowLeft, Sparkles, FileUp, FileText, Check } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const LOCAL_STORAGE_KEY_DATA = 'resumeedge_data';
@@ -21,6 +21,15 @@ const LOCAL_STORAGE_KEY_TPL = 'resumeedge_template';
 const LOCAL_STORAGE_KEY_SETTINGS = 'resumeedge_settings';
 const LOCAL_STORAGE_KEY_ORDER = 'resumeedge_section_order';
 const LOCAL_STORAGE_KEY_PENDING_TOAST = 'resumeedge_pending_toast';
+const LOCAL_STORAGE_KEY_IMPORTED_FILE = 'resumeedge_imported_file';
+
+function formatBytes(bytes) {
+  if (bytes === 0) return '0 Bytes';
+  const k = 1024;
+  const sizes = ['Bytes', 'KB', 'MB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+}
 
 const defaultState = {
   personal: {
@@ -135,6 +144,41 @@ export function Builder() {
   // Toasts state management
   const [toasts, setToasts] = useState([]);
   const [showOnboarding, setShowOnboarding] = useState(true);
+  const fileInputRef = useRef(null);
+
+  const [importedFile, setImportedFile] = useState(() => {
+    try {
+      const saved = localStorage.getItem(LOCAL_STORAGE_KEY_IMPORTED_FILE);
+      return saved ? JSON.parse(saved) : null;
+    } catch {
+      return null;
+    }
+  });
+
+  const handleImportFile = (file) => {
+    const ext = file.name.split('.').pop().toLowerCase();
+    if (ext !== 'pdf' && ext !== 'docx') {
+      addToast('Invalid file format. Please upload a PDF or DOCX file.', 'warning');
+      return;
+    }
+
+    const fileRef = {
+      name: file.name,
+      size: file.size,
+      uploadedAt: new Date().toISOString(),
+    };
+
+    localStorage.setItem(LOCAL_STORAGE_KEY_IMPORTED_FILE, JSON.stringify(fileRef));
+    setImportedFile(fileRef);
+    addToast('Resume imported successfully. Parsing support coming soon.', 'success');
+  };
+
+  const handleRemoveImport = (e) => {
+    e.stopPropagation();
+    localStorage.removeItem(LOCAL_STORAGE_KEY_IMPORTED_FILE);
+    setImportedFile(null);
+    addToast('Imported file unlinked.', 'info');
+  };
 
   const isEmptyData = 
     !resumeData.personal.fullName && 
@@ -412,62 +456,21 @@ export function Builder() {
           {/* Column 1: Form (col-span-4) */}
           <div className="lg:col-span-4 space-y-6">
             {isEmptyData && showOnboarding ? (
-              <div className="bg-surface border border-slate-800 rounded-2xl p-6 md:p-8 space-y-6 text-left shadow-2xl relative overflow-hidden animate-fade-in">
+              <div className="bg-surface border border-slate-800 rounded-2xl p-6 space-y-5 text-left shadow-2xl relative overflow-hidden animate-fade-in">
                 {/* Visual light glow */}
                 <div className="absolute -top-20 -left-20 h-40 w-40 rounded-full bg-primary/15 blur-3xl pointer-events-none"></div>
                 
                 {/* Onboarding Header */}
-                <div className="space-y-2 relative z-10">
+                <div className="space-y-1 relative z-10">
                   <Badge variant="primary" className="mb-1">Getting Started</Badge>
-                  <h3 className="text-xl md:text-2xl font-bold tracking-tight text-text">Welcome to ResumeEdge</h3>
+                  <h3 className="text-xl font-bold tracking-tight text-text">Welcome to ResumeEdge</h3>
                   <p className="text-xs text-muted leading-relaxed font-semibold">
-                    Create ATS-friendly resumes in minutes. Choose how you want to start building your professional profile.
+                    Create ATS-friendly resumes in minutes. Choose how you want to start building.
                   </p>
                 </div>
 
-                {/* Pure CSS Onboarding Illustration */}
-                <div className="relative w-full h-32 bg-slate-950/60 rounded-xl border border-slate-850/80 overflow-hidden flex items-center justify-center mb-6">
-                  {/* Ambient glowing background circles */}
-                  <div className="absolute top-1/2 left-1/4 h-20 w-20 rounded-full bg-primary/10 blur-2xl -translate-y-1/2"></div>
-                  <div className="absolute top-1/2 right-1/4 h-20 w-20 rounded-full bg-secondary/10 blur-2xl -translate-y-1/2"></div>
-                  
-                  {/* Resume preview simulation */}
-                  <div className="relative w-20 h-28 bg-slate-900 border border-slate-800 rounded-lg p-2.5 shadow-xl flex flex-col justify-between">
-                    <div className="space-y-1.5">
-                      {/* Avatar & Header */}
-                      <div className="flex gap-1.5 items-center">
-                        <div className="h-4.5 w-4.5 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center text-[7px] font-black text-primary-light">✓</div>
-                        <div className="h-1.5 w-10 bg-slate-800 rounded"></div>
-                      </div>
-                      <div className="h-1 w-full bg-slate-800 rounded"></div>
-                      
-                      {/* Content lines */}
-                      <div className="space-y-1 pt-1.5">
-                        <div className="h-0.5 w-5/6 bg-slate-800/80 rounded"></div>
-                        <div className="h-0.5 w-2/3 bg-slate-800/80 rounded"></div>
-                        <div className="h-0.5 w-full bg-slate-800/80 rounded"></div>
-                      </div>
-                    </div>
-                    
-                    {/* Page indicator check */}
-                    <div className="flex justify-between items-center pt-2">
-                      <div className="h-1.5 w-6 bg-secondary/20 border border-secondary/30 rounded"></div>
-                      <div className="h-1.5 w-1.5 rounded-full bg-success animate-pulse"></div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Action Buttons */}
-                <div className="flex flex-col gap-3 relative z-10 pt-2">
-                  <button
-                    onClick={handleLoadDemo}
-                    type="button"
-                    className="w-full flex items-center justify-center gap-2 text-xs font-bold bg-primary hover:bg-primary-dark text-text border border-primary-light/25 shadow-premium-glow hover:shadow-premium-glow-hover px-4 py-2.5 rounded-xl transition-all active:scale-[0.98] cursor-pointer"
-                  >
-                    <Sparkles className="h-3.5 w-3.5" />
-                    Load Demo Resume
-                  </button>
-
+                {/* Compact Action Buttons */}
+                <div className="flex flex-col gap-2 relative z-10">
                   <button
                     onClick={() => setShowOnboarding(false)}
                     type="button"
@@ -475,7 +478,72 @@ export function Builder() {
                   >
                     Start From Scratch
                   </button>
+
+                  <button
+                    onClick={handleLoadDemo}
+                    type="button"
+                    className="w-full flex items-center justify-center gap-2 text-xs font-bold bg-primary hover:bg-primary-dark text-text border border-primary-light/25 shadow-premium-glow hover:shadow-premium-glow-hover px-4 py-2.5 rounded-xl transition-all active:scale-[0.98] cursor-pointer"
+                  >
+                    <Sparkles className="h-3.5 w-3.5 text-primary-light" />
+                    Load Demo Resume
+                  </button>
+
+                  <button
+                    onClick={() => fileInputRef.current?.click()}
+                    type="button"
+                    className="w-full flex items-center justify-center gap-2 text-xs font-bold bg-slate-900 hover:bg-slate-850 text-text border border-slate-800 hover:border-slate-700 px-4 py-2.5 rounded-xl transition-all active:scale-[0.98] cursor-pointer"
+                  >
+                    <FileUp className="h-3.5 w-3.5 text-secondary-light" />
+                    Import Existing Resume
+                  </button>
+
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={(e) => {
+                      if (e.target.files && e.target.files.length > 0) {
+                        handleImportFile(e.target.files[0]);
+                      }
+                    }}
+                    accept=".pdf,.docx"
+                    className="hidden"
+                  />
                 </div>
+
+                {/* Import File Status Card */}
+                {importedFile && (
+                  <div className="p-4 border border-slate-800 bg-slate-950/40 rounded-xl relative z-10 flex flex-col gap-3 animate-fade-in">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <FileText className="h-4 w-4 text-primary shrink-0" />
+                        <span className="font-bold text-text text-xs truncate block max-w-[170px]" title={importedFile.name}>
+                          {importedFile.name}
+                        </span>
+                      </div>
+                      <button
+                        onClick={handleRemoveImport}
+                        type="button"
+                        className="text-red-400 hover:text-red-300 p-0.5 transition-colors cursor-pointer shrink-0"
+                        title="Remove imported reference"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+
+                    <div className="flex flex-col gap-1 text-[10px] text-muted font-semibold">
+                      <div>Size: {formatBytes(importedFile.size)}</div>
+                      <div>Imported: {new Date(importedFile.uploadedAt).toLocaleDateString()}</div>
+                    </div>
+
+                    <Badge
+                      variant="success"
+                      className="text-[8px] py-0.5 px-2 bg-success/10 border-success/20 text-success flex items-center gap-1 font-bold tracking-wider uppercase w-fit"
+                    >
+                      <span className="h-1 w-1 rounded-full bg-success animate-pulse" />
+                      Imported Reference
+                    </Badge>
+                  </div>
+                )}
               </div>
             ) : (
               <ResumeForm 
