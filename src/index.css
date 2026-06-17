@@ -47,7 +47,26 @@
   }
 }
 
-/* Premium typography & styling utilities */
+/* Custom premium CSS utility classes and animations */
+@utility animate-spin-slow {
+  animation: spin 12s linear infinite;
+}
+
+@utility animate-fade-in {
+  animation: fade-in 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .gradient-text {
   @apply bg-clip-text text-transparent bg-gradient-to-r from-primary-light via-primary to-secondary-light;
 }
