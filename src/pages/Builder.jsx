@@ -391,7 +391,8 @@ export function Builder() {
             <ExportPDFButton 
               elementId="resume-print-content" 
               filename={exportFilename} 
-              onSuccess={() => addToast('Resume PDF downloaded!', 'success')}
+              onSuccess={() => addToast('PDF exported successfully!', 'success')}
+              onError={(msg) => addToast(msg, 'warning')}
               className="h-9 px-4 text-xs font-semibold shrink-0"
             />
 
@@ -491,7 +492,7 @@ export function Builder() {
           </div>
 
           {/* Column 2: Live Sticky Preview (col-span-8) */}
-          <div className="lg:col-span-8 lg:sticky lg:top-24">
+          <div className="lg:col-span-8 lg:sticky lg:top-24 lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto lg:pr-1 preview-scroll-container">
             <ResumePreview data={resumeData} template={template} settings={settings} sectionOrder={sectionOrder} />
           </div>
         </div>

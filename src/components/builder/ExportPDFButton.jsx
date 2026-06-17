@@ -4,59 +4,124 @@ import { jsPDF } from 'jspdf';
 import { FileDown, Loader2 } from 'lucide-react';
 import { Button } from '../ui/Button';
 
-export function ExportPDFButton({ elementId, filename = 'resume.pdf', onSuccess, className = 'w-full h-11' }) {
+export function ExportPDFButton({ elementId, filename = 'resume.pdf', onSuccess, onError, className = 'w-full h-11' }) {
   const [isExporting, setIsExporting] = useState(false);
 
   const handleExport = async () => {
     const element = document.getElementById(elementId);
     if (!element) {
-      alert('Resume preview container not found.');
+      if (onError) onError('Resume preview container not found.');
       return;
     }
 
     // Protect against exporting empty/blank resumes
     const isEmpty = element.querySelector('[data-empty-preview="true"]');
     if (isEmpty) {
-      alert('Your resume is empty. Please enter your details before exporting.');
+      if (onError) onError('Your resume is empty. Please enter your details before exporting.');
       return;
     }
 
     try {
       setIsExporting(true);
-      
-      // Render canvas snapshot of the resume container element
-      const canvas = await html2canvas(element, {
-        scale: 2, // 2x density for clear printing resolution
-        useCORS: true,
-        backgroundColor: '#0F172A', // match canvas backdrop with application theme background
-        logging: false,
+
+      // Save original styles for restoration
+      const originalBg = element.style.backgroundColor;
+      const originalColor = element.style.color;
+      const originalBorder = element.style.border;
+      const originalBorderRadius = element.style.borderRadius;
+      const originalBoxShadow = element.style.boxShadow;
+
+      // Temporarily override dark bg to white for PDF printing
+      element.style.backgroundColor = '#ffffff';
+      element.style.color = '#111111';
+      element.style.border = 'none';
+      element.style.borderRadius = '0';
+      element.style.boxShadow = 'none';
+
+      // Force text colour on all children for readability in white bg
+      const allNodes = element.querySelectorAll('*');
+      const nodeOriginals = [];
+      allNodes.forEach((node) => {
+        nodeOriginals.push({
+          node,
+          color: node.style.color,
+          bg: node.style.backgroundColor,
+          border: node.style.borderColor,
+        });
+        const computed = window.getComputedStyle(node);
+        const c = computed.color;
+        // If text appears very light (near white), darken for PDF
+        if (c) {
+          const rgb = c.match(/\d+/g);
+          if (rgb && rgb.length >= 3) {
+            const brightness = (parseInt(rgb[0]) * 299 + parseInt(rgb[1]) * 587 + parseInt(rgb[2]) * 114) / 1000;
+            if (brightness > 200) {
+              node.style.color = '#333333';
+            }
+          }
+        }
       });
 
-      const imgData = canvas.toDataURL('image/png');
-      
-      // Standardize PDF output to A4 dimensions
+      await new Promise((r) => setTimeout(r, 80)); // allow reflow
+
+      const canvas = await html2canvas(element, {
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: '#ffffff',
+        logging: false,
+        imageTimeout: 0,
+        removeContainer: true,
+      });
+
+      // Restore original styles
+      element.style.backgroundColor = originalBg;
+      element.style.color = originalColor;
+      element.style.border = originalBorder;
+      element.style.borderRadius = originalBorderRadius;
+      element.style.boxShadow = originalBoxShadow;
+      nodeOriginals.forEach(({ node, color, bg, border }) => {
+        node.style.color = color;
+        node.style.backgroundColor = bg;
+        node.style.borderColor = border;
+      });
+
+      const imgData = canvas.toDataURL('image/jpeg', 0.95);
+
+      // Use mm units — standard A4 is 210 x 297 mm
       const pdf = new jsPDF({
         orientation: 'portrait',
-        unit: 'px',
+        unit: 'mm',
         format: 'a4',
       });
 
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = pdf.internal.pageSize.getHeight();
-      
-      // Scale coordinates to fit image on page width
-      const imgWidth = pdfWidth;
-      const imgHeight = (canvas.height * pdfWidth) / canvas.width;
+      const pageW = pdf.internal.pageSize.getWidth();  // 210mm
+      const pageH = pdf.internal.pageSize.getHeight(); // 297mm
 
-      pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+      const canvasAspect = canvas.height / canvas.width;
+      const imgH = pageW * canvasAspect;
+
+      if (imgH <= pageH) {
+        // Single page — fits completely
+        pdf.addImage(imgData, 'JPEG', 0, 0, pageW, imgH);
+      } else {
+        // Multi-page slicing
+        let yOffset = 0;
+        while (yOffset < imgH) {
+          if (yOffset > 0) pdf.addPage();
+          pdf.addImage(imgData, 'JPEG', 0, -yOffset, pageW, imgH);
+          yOffset += pageH;
+        }
+      }
+
       pdf.save(filename);
 
       if (onSuccess) {
         onSuccess();
       }
     } catch (err) {
-      console.error('Failed to generate PDF:', err);
-      alert('Could not compile PDF document. Please try again.');
+      console.error('PDF generation failed:', err);
+      if (onError) onError('Could not generate PDF. Please try again.');
     } finally {
       setIsExporting(false);
     }
@@ -72,7 +137,7 @@ export function ExportPDFButton({ elementId, filename = 'resume.pdf', onSuccess,
       {isExporting ? (
         <>
           <Loader2 className="h-4 w-4 animate-spin" />
-          Compiling PDF...
+          Generating PDF...
         </>
       ) : (
         <>
