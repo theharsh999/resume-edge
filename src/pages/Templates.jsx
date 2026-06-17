@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Layout } from '../components/layout/Layout';
 import { Container } from '../components/ui/Container';
 import { Section } from '../components/ui/Section';
@@ -189,6 +189,9 @@ const LOCAL_STORAGE_KEY_TOAST = 'resumeedge_pending_toast';
 
 export function Templates() {
   const navigate = useNavigate();
+  const [activeTemplate] = useState(() => {
+    return localStorage.getItem(LOCAL_STORAGE_KEY_TPL) || 'modern';
+  });
 
   const templates = [
     {
@@ -264,7 +267,12 @@ export function Templates() {
             {templates.map((template) => (
               <Card 
                 key={template.id} 
-                className="flex flex-col h-full group p-7 rounded-2xl bg-surface/40 border-slate-800/60 hover:border-slate-700/80 hover:shadow-premium-glow hover-elevation" 
+                onClick={() => handleSelectTemplate(template.id)}
+                className={`flex flex-col h-full group p-7 rounded-2xl bg-surface/40 border transition-all duration-300 hover:shadow-premium-glow hover-elevation cursor-pointer relative ${
+                  activeTemplate === template.id 
+                    ? 'border-primary bg-primary/5 shadow-premium-glow ring-1 ring-primary/20' 
+                    : 'border-slate-800/60 hover:border-slate-700/80'
+                }`}
                 hoverEffect={false}
               >
                 {/* 1. Preview */}
@@ -280,9 +288,20 @@ export function Templates() {
                 {/* Card Details */}
                 <div className="flex-grow flex flex-col text-left space-y-3">
                   {/* 2. Template Name */}
-                  <h3 className="text-xl font-bold text-text group-hover:text-primary-light transition-colors duration-200">
-                    {template.name}
-                  </h3>
+                  <div className="flex justify-between items-start gap-2">
+                    <h3 className="text-xl font-bold text-text group-hover:text-primary-light transition-colors duration-200">
+                      {template.name}
+                    </h3>
+                    {activeTemplate === template.id && (
+                      <Badge 
+                        variant="success" 
+                        className="text-[9px] py-0.5 px-2.5 font-extrabold uppercase tracking-wider shrink-0 bg-success/15 border-success/30 text-success flex items-center gap-1.5"
+                      >
+                        <span className="h-1.5 w-1.5 rounded-full bg-success animate-pulse"></span>
+                        Currently Active
+                      </Badge>
+                    )}
+                  </div>
                   
                   {/* 3. Short Description */}
                   <p className="text-xs text-muted leading-relaxed flex-grow font-semibold">
@@ -311,16 +330,6 @@ export function Templates() {
                       );
                     })}
                   </div>
-                </div>
-
-                <div className="mt-6 pt-4 border-t border-slate-900 flex justify-between items-center">
-                  <span className="text-[10px] text-muted font-extrabold uppercase tracking-wider">100% Free Access</span>
-                  <button 
-                    onClick={() => handleSelectTemplate(template.id)}
-                    className="text-xs font-bold text-primary hover:text-primary-light flex items-center gap-1.5 transition-colors duration-200 cursor-pointer"
-                  >
-                    Build Now <ArrowRight className="h-3.5 w-3.5" />
-                  </button>
                 </div>
               </Card>
             ))}
