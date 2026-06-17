@@ -39,15 +39,15 @@ const defaultState = {
   projects: []
 };
 
-const defaultSettings = {
+export const defaultSettings = {
   primaryColor: 'indigo',
   fontFamily: 'Inter',
   density: 'balanced'
 };
 
-const defaultOrder = ['summary', 'skills', 'experience', 'projects', 'education'];
+export const defaultOrder = ['summary', 'skills', 'experience', 'projects', 'education'];
 
-const demoResumeData = {
+export const demoResumeData = {
   personal: {
     fullName: 'Alex Morgan',
     role: 'Senior Frontend Engineer',
