@@ -8,6 +8,182 @@ import { Button } from '../components/ui/Button';
 import { Sparkles, ArrowRight, LayoutTemplate } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
+const ModernMini = ({ accentColor }) => (
+  <div className="flex h-full w-full bg-slate-950 text-[4.5px] leading-tight select-none rounded-lg overflow-hidden border border-slate-800">
+    {/* Sidebar */}
+    <div className="w-[32%] bg-slate-900/60 border-r border-slate-850 p-1.5 space-y-2 text-left">
+      <div className="space-y-0.5">
+        <div className="h-1 w-5 bg-slate-700/80 rounded"></div>
+        <div className="text-[3.5px] text-slate-500 break-all">alex@morgan.io</div>
+        <div className="text-[3.5px] text-slate-500">Seattle, WA</div>
+      </div>
+      <div className="space-y-1 pt-1 border-t border-slate-850">
+        <div className="h-1 w-5 bg-slate-700/80 rounded"></div>
+        <div className="flex flex-wrap gap-0.5">
+          <span className="px-0.8 py-0.1 rounded bg-slate-850 text-slate-400">React</span>
+          <span className="px-0.8 py-0.1 rounded bg-slate-850 text-slate-400">Node</span>
+          <span className="px-0.8 py-0.1 rounded bg-slate-850 text-slate-400">Vite</span>
+        </div>
+      </div>
+    </div>
+    {/* Body */}
+    <div className="flex-grow p-1.5 space-y-1.5 text-left bg-slate-900/20">
+      <div className="border-b border-slate-850 pb-1 space-y-0.5">
+        <div className="font-extrabold text-[6.5px] text-text">Alex Morgan</div>
+        <div className={`font-bold text-[5px] ${accentColor}`}>Frontend Developer</div>
+      </div>
+      <div className="space-y-0.5">
+        <div className="h-1 w-8 bg-slate-700/60 rounded"></div>
+        <p className="text-slate-400 text-[4px]">Senior developer with 6+ years constructing React applications.</p>
+      </div>
+      <div className="space-y-1">
+        <div className="h-1 w-8 bg-slate-700/60 rounded"></div>
+        <div className="space-y-0.5">
+          <div className="flex justify-between text-slate-300 font-bold"><span>Stripe</span><span>2023 - Pres</span></div>
+          <div className="text-slate-400 text-[3.8px]">• Built dynamic dashboard widgets.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
+const ProfessionalMini = ({ accentColor }) => (
+  <div className="h-full w-full bg-slate-950 p-2 space-y-1.5 text-[4.5px] leading-tight select-none font-serif rounded-lg border border-slate-800 text-center">
+    <div className="border-b border-slate-850 pb-1 space-y-0.5">
+      <div className="font-bold text-[6.5px] text-text">Alex Morgan</div>
+      <div className={`italic text-[5px] ${accentColor}`}>Frontend Developer</div>
+      <div className="text-slate-500 flex justify-center gap-1 font-sans text-[3.5px]">
+        <span>alex@morgan.io</span><span>|</span><span>Seattle, WA</span>
+      </div>
+    </div>
+    <div className="space-y-0.5 text-left">
+      <div className="h-1 w-12 bg-slate-700/60 rounded mx-auto"></div>
+      <p className="text-slate-400 text-center">Senior developer with 6+ years constructing React applications.</p>
+    </div>
+    <div className="space-y-1 text-left">
+      <div className="h-1 w-12 bg-slate-700/60 rounded"></div>
+      <div className="space-y-0.5">
+        <div className="flex justify-between font-bold text-slate-300"><span>Stripe</span><span>2023 - Pres</span></div>
+        <p className="text-slate-400 text-[3.8px]">• Engineered billing dashboard interfaces.</p>
+      </div>
+    </div>
+  </div>
+);
+
+const MinimalMini = ({ accentColor }) => (
+  <div className="h-full w-full bg-slate-950 p-2.5 space-y-1.5 text-[4.5px] leading-tight select-none rounded-lg border border-slate-800 text-left">
+    <div className="flex justify-between items-baseline border-b border-slate-850 pb-1">
+      <div>
+        <div className="font-bold text-[6.5px] text-text">Alex Morgan</div>
+        <div className={`font-semibold text-[5px] ${accentColor}`}>Frontend Developer</div>
+      </div>
+      <div className="text-slate-500 text-right text-[3.5px]">
+        <div>alex@morgan.io</div>
+        <div>Seattle, WA</div>
+      </div>
+    </div>
+    <div className="space-y-0.5">
+      <div className="h-1 w-8 bg-slate-700/60 rounded"></div>
+      <p className="text-slate-400">Senior developer with 6+ years constructing React applications.</p>
+    </div>
+    <div className="space-y-1">
+      <div className="h-1 w-8 bg-slate-700/60 rounded"></div>
+      <div className="space-y-0.5">
+        <div className="flex justify-between font-bold text-slate-300"><span>Stripe</span><span>2023 - Pres</span></div>
+        <p className="text-slate-400 text-[3.8px]">• Constructed responsive billing panels.</p>
+      </div>
+    </div>
+  </div>
+);
+
+const CreativeMini = ({ accentColor, borderAccent, bgAccent }) => (
+  <div className="flex h-full w-full bg-slate-950 text-[4.5px] leading-tight select-none rounded-lg overflow-hidden border border-slate-800 relative">
+    <div className={`absolute top-0 left-0 bottom-0 w-0.5 ${borderAccent} border-l`}></div>
+    {/* Sidebar */}
+    <div className="w-[30%] bg-slate-900/40 border-r border-slate-850 p-1.5 space-y-2 text-left pl-2">
+      <div className="space-y-0.5">
+        <div className={`text-[5px] font-bold ${accentColor}`}>Details</div>
+        <div className="text-[3.5px] text-slate-400">alex@morgan.io</div>
+        <div className="text-[3.5px] text-slate-400">Seattle, WA</div>
+      </div>
+      <div className="space-y-0.5 pt-1">
+        <div className={`text-[5px] font-bold ${accentColor}`}>Skills</div>
+        <div className="flex flex-wrap gap-0.5">
+          <span className={`px-0.8 py-0.1 rounded ${bgAccent} ${accentColor}`}>React</span>
+          <span className={`px-0.8 py-0.1 rounded ${bgAccent} ${accentColor}`}>Node</span>
+        </div>
+      </div>
+    </div>
+    {/* Body */}
+    <div className="flex-grow p-1.5 space-y-1.5 text-left">
+      <div className="border-b border-slate-850 pb-1 space-y-0.5">
+        <div className="font-black text-[6.5px] text-text uppercase">Alex Morgan</div>
+        <div className={`font-bold text-[5px] ${accentColor} uppercase tracking-wide`}>Frontend Developer</div>
+      </div>
+      <div className="space-y-0.5">
+        <div className="h-1 w-8 bg-slate-700/60 rounded"></div>
+        <p className="text-slate-400 text-[4px]">Senior developer with 6+ years constructing React applications.</p>
+      </div>
+      <div className="space-y-1">
+        <div className="h-1 w-8 bg-slate-700/60 rounded"></div>
+        <div className="space-y-0.5">
+          <div className="flex justify-between font-bold text-slate-300"><span>Stripe</span><span>2023 - Pres</span></div>
+          <p className="text-slate-400 text-[3.8px]">• Built scalable design systems library.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
+const ExecutiveMini = ({ accentColor, borderAccent }) => (
+  <div className={`h-full w-full bg-slate-950 p-2 space-y-1.5 text-[4.5px] leading-tight select-none font-serif rounded-lg border border-slate-800 border-t-2 ${borderAccent} text-left`}>
+    <div className="flex justify-between items-end border-b border-slate-850 pb-1">
+      <div>
+        <div className="font-bold text-[6.5px] text-text">Alex Morgan</div>
+        <div className={`font-semibold text-[5px] uppercase tracking-wide ${accentColor}`}>Frontend Developer</div>
+      </div>
+      <div className="text-slate-500 text-right text-[3.5px] font-sans">
+        <div>Email: alex@morgan.io</div>
+        <div>Loc: Seattle, WA</div>
+      </div>
+    </div>
+    <div className="space-y-0.5">
+      <div className="h-1 w-8 bg-slate-700/60 rounded"></div>
+      <p className="text-slate-400">Senior developer with 6+ years constructing React applications.</p>
+    </div>
+    <div className="space-y-1">
+      <div className="h-1 w-8 bg-slate-700/60 rounded"></div>
+      <div className="space-y-0.5">
+        <div className="flex justify-between font-bold text-slate-300"><span>Stripe</span><span>2023 - Pres</span></div>
+        <p className="text-slate-400 text-[3.8px]">• Constructed secure dashboard layouts.</p>
+      </div>
+    </div>
+  </div>
+);
+
+const CompactMini = ({ accentColor }) => (
+  <div className="h-full w-full bg-slate-950 p-1.5 space-y-1 text-[4.5px] leading-tight select-none rounded-lg border border-slate-800 text-left">
+    <div className="flex justify-between items-baseline border-b border-slate-850 pb-0.5">
+      <div>
+        <span className="font-bold text-[6.5px] text-text">Alex Morgan</span>
+        <span className={`ml-1 text-[4.5px] ${accentColor} font-bold uppercase`}>Frontend Developer</span>
+      </div>
+      <div className="text-slate-500 text-[3.5px] flex gap-1 font-semibold">
+        <span>alex@morgan.io</span><span>•</span><span>Seattle, WA</span>
+      </div>
+    </div>
+    <div className="space-y-0.2">
+      <p className="text-slate-400 text-[4px]">Senior developer with 6+ years constructing React applications.</p>
+    </div>
+    <div className="space-y-0.8">
+      <div className="space-y-0.2">
+        <div className="flex justify-between font-bold text-slate-300"><span>Stripe</span><span>2023 - Pres</span></div>
+        <p className="text-slate-400 text-[3.8px]">• Constructed responsive billing panels.</p>
+      </div>
+    </div>
+  </div>
+);
+
 const LOCAL_STORAGE_KEY_TPL = 'resumeedge_template';
 const LOCAL_STORAGE_KEY_TOAST = 'resumeedge_pending_toast';
 
@@ -91,45 +267,30 @@ export function Templates() {
                 className="flex flex-col h-full group p-7 rounded-2xl bg-surface/40 border-slate-800/60 hover:border-slate-700/80 hover:shadow-premium-glow hover-elevation" 
                 hoverEffect={false}
               >
-                {/* Template Mockup representation */}
-                <div className={`aspect-[3/4] w-full rounded-xl bg-gradient-to-br ${template.color} border border-slate-800/80 mb-6 flex flex-col p-5 justify-between overflow-hidden relative group-hover:border-slate-700/80 transition-all duration-300 group-hover:scale-[1.02]`}>
+                {/* 1. Preview */}
+                <div className={`aspect-[3/4] w-full rounded-xl bg-gradient-to-br ${template.color} border border-slate-800/80 mb-6 flex flex-col p-1 overflow-hidden relative transition-all duration-300 group-hover:scale-[1.02]`}>
+                  {template.id === 'modern' && <ModernMini accentColor="text-indigo-400" />}
+                  {template.id === 'professional' && <ProfessionalMini accentColor="text-emerald-400" />}
+                  {template.id === 'minimal' && <MinimalMini accentColor="text-blue-400" />}
+                  {template.id === 'creative' && <CreativeMini accentColor="text-purple-400" borderAccent="border-purple-500" bgAccent="bg-purple-500/10" />}
+                  {template.id === 'executive' && <ExecutiveMini accentColor="text-amber-400" borderAccent="border-amber-500" />}
+                  {template.id === 'compact' && <CompactMini accentColor="text-rose-400" />}
+                </div>
+
+                {/* Card Details */}
+                <div className="flex-grow flex flex-col text-left space-y-3">
+                  {/* 2. Template Name */}
+                  <h3 className="text-xl font-bold text-text group-hover:text-primary-light transition-colors duration-200">
+                    {template.name}
+                  </h3>
                   
-                  {/* Visual resume outline */}
-                  <div className="space-y-4 w-full pr-4 text-left opacity-75 group-hover:opacity-95 transition-opacity duration-300">
-                    <div className="flex justify-between items-center border-b border-white/5 pb-2">
-                      <div className="space-y-1">
-                        <div className="h-3 w-24 bg-white/25 rounded"></div>
-                        <div className="h-2 w-14 bg-primary/35 rounded animate-pulse"></div>
-                      </div>
-                      <div className="h-2.5 w-16 bg-white/10 rounded"></div>
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <div className="h-2 w-12 bg-white/20 rounded"></div>
-                      <div className="h-1.5 w-full bg-white/10 rounded"></div>
-                      <div className="h-1.5 w-5/6 bg-white/10 rounded"></div>
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <div className="h-2 w-16 bg-white/20 rounded"></div>
-                      <div className="h-1.5 w-full bg-white/10 rounded"></div>
-                      <div className="h-1.5 w-4/5 bg-white/10 rounded"></div>
-                    </div>
-                  </div>
+                  {/* 3. Short Description */}
+                  <p className="text-xs text-muted leading-relaxed flex-grow font-semibold">
+                    {template.description}
+                  </p>
 
-                  {/* Hover Actions overlay */}
-                  <div className="absolute inset-0 bg-slate-950/85 backdrop-blur-[3px] opacity-0 group-hover:opacity-100 flex items-center justify-center gap-3 transition-opacity duration-350">
-                    <Button 
-                      variant="primary" 
-                      size="md" 
-                      onClick={() => handleSelectTemplate(template.id)}
-                      className="gap-2 font-bold px-6 shadow-premium-glow"
-                    >
-                      Use Template <ArrowRight className="h-4 w-4" />
-                    </Button>
-                  </div>
-
-                  <div className="flex flex-wrap gap-1.5 relative z-10">
+                  {/* 4. Badges */}
+                  <div className="flex flex-wrap gap-1.5 pt-2 border-t border-slate-900/60">
                     {template.tags.map((tag, idx) => {
                       const isPopular = tag.toLowerCase().includes('popular');
                       const isAts = tag.toLowerCase().includes('ats');
@@ -137,7 +298,7 @@ export function Templates() {
                         <Badge 
                           key={idx} 
                           variant={isPopular ? 'primary' : isAts ? 'success' : 'muted'} 
-                          className={`text-[9px] py-0.5 px-2 font-extrabold uppercase tracking-wider ${
+                          className={`text-[9px] py-0.5 px-2.5 font-extrabold uppercase tracking-wider ${
                             isPopular 
                               ? 'bg-primary/10 border-primary-light/20 text-primary-light' 
                               : isAts 
@@ -150,15 +311,6 @@ export function Templates() {
                       );
                     })}
                   </div>
-                </div>
-
-                <div className="flex-grow flex flex-col text-left">
-                  <h3 className="text-xl font-bold text-text mb-2 group-hover:text-primary-light transition-colors duration-200">
-                    {template.name}
-                  </h3>
-                  <p className="text-xs text-muted leading-relaxed flex-grow font-semibold">
-                    {template.description}
-                  </p>
                 </div>
 
                 <div className="mt-6 pt-4 border-t border-slate-900 flex justify-between items-center">
