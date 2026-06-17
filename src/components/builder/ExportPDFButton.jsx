@@ -14,6 +14,13 @@ export function ExportPDFButton({ elementId, filename = 'resume.pdf', onSuccess,
       return;
     }
 
+    // Protect against exporting empty/blank resumes
+    const isEmpty = element.querySelector('[data-empty-preview="true"]');
+    if (isEmpty) {
+      alert('Your resume is empty. Please enter your details before exporting.');
+      return;
+    }
+
     try {
       setIsExporting(true);
       

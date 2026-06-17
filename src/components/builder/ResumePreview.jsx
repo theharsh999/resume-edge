@@ -407,7 +407,7 @@ export function ResumePreview({
       <div className="flex-grow" style={fontStyle}>
         {(!hasPersonal && !hasSummary && !hasSkills && !hasExperience && !hasEducation && !hasProjects) ? (
           /* Empty state block */
-          <div className="h-full min-h-[450px] flex flex-col items-center justify-center text-center p-8 space-y-4 font-sans">
+          <div data-empty-preview="true" className="h-full min-h-[450px] flex flex-col items-center justify-center text-center p-8 space-y-4 font-sans">
             <div className="h-12 w-12 rounded-xl bg-slate-800/80 border border-slate-700/80 flex items-center justify-center text-muted">
               <FileText className="h-6 w-6" />
             </div>

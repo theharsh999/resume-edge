@@ -304,8 +304,9 @@ export function ResumeForm({
         <SectionAccordion title="Personal Information" icon={User} defaultOpen={true}>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
             <div className="col-span-1 sm:col-span-2">
-              <label className="block text-[10px] font-bold text-muted uppercase tracking-wider mb-1">Full Name</label>
+              <label htmlFor="personal-fullName" className="block text-[10px] font-bold text-muted uppercase tracking-wider mb-1">Full Name</label>
               <input
+                id="personal-fullName"
                 type="text"
                 value={data.personal.fullName || ''}
                 onChange={(e) => updatePersonal('fullName', e.target.value)}
@@ -314,8 +315,9 @@ export function ResumeForm({
               />
             </div>
             <div className="col-span-1 sm:col-span-2">
-              <label className="block text-[10px] font-bold text-muted uppercase tracking-wider mb-1">Professional Role</label>
+              <label htmlFor="personal-role" className="block text-[10px] font-bold text-muted uppercase tracking-wider mb-1">Professional Role</label>
               <input
+                id="personal-role"
                 type="text"
                 value={data.personal.role || ''}
                 onChange={(e) => updatePersonal('role', e.target.value)}
@@ -324,8 +326,9 @@ export function ResumeForm({
               />
             </div>
             <div>
-              <label className="block text-[10px] font-bold text-muted uppercase tracking-wider mb-1">Email Address</label>
+              <label htmlFor="personal-email" className="block text-[10px] font-bold text-muted uppercase tracking-wider mb-1">Email Address</label>
               <input
+                id="personal-email"
                 type="email"
                 value={data.personal.email || ''}
                 onChange={(e) => updatePersonal('email', e.target.value)}
@@ -334,8 +337,9 @@ export function ResumeForm({
               />
             </div>
             <div>
-              <label className="block text-[10px] font-bold text-muted uppercase tracking-wider mb-1">Phone Number</label>
+              <label htmlFor="personal-phone" className="block text-[10px] font-bold text-muted uppercase tracking-wider mb-1">Phone Number</label>
               <input
+                id="personal-phone"
                 type="text"
                 value={data.personal.phone || ''}
                 onChange={(e) => updatePersonal('phone', e.target.value)}
@@ -344,8 +348,9 @@ export function ResumeForm({
               />
             </div>
             <div>
-              <label className="block text-[10px] font-bold text-muted uppercase tracking-wider mb-1">Location</label>
+              <label htmlFor="personal-location" className="block text-[10px] font-bold text-muted uppercase tracking-wider mb-1">Location</label>
               <input
+                id="personal-location"
                 type="text"
                 value={data.personal.location || ''}
                 onChange={(e) => updatePersonal('location', e.target.value)}
@@ -354,8 +359,9 @@ export function ResumeForm({
               />
             </div>
             <div>
-              <label className="block text-[10px] font-bold text-muted uppercase tracking-wider mb-1">LinkedIn URL</label>
+              <label htmlFor="personal-linkedin" className="block text-[10px] font-bold text-muted uppercase tracking-wider mb-1">LinkedIn URL</label>
               <input
+                id="personal-linkedin"
                 type="text"
                 value={data.personal.linkedin || ''}
                 onChange={(e) => updatePersonal('linkedin', e.target.value)}
@@ -364,8 +370,9 @@ export function ResumeForm({
               />
             </div>
             <div className="col-span-1 sm:col-span-2">
-              <label className="block text-[10px] font-bold text-muted uppercase tracking-wider mb-1">GitHub Profile Link</label>
+              <label htmlFor="personal-github" className="block text-[10px] font-bold text-muted uppercase tracking-wider mb-1">GitHub Profile Link</label>
               <input
+                id="personal-github"
                 type="text"
                 value={data.personal.github || ''}
                 onChange={(e) => updatePersonal('github', e.target.value)}
@@ -380,10 +387,11 @@ export function ResumeForm({
         <SectionAccordion title="Professional Summary" icon={FileText}>
           <div className="text-xs space-y-3">
             <div className="flex justify-between items-baseline">
-              <label className="block text-[10px] font-bold text-muted uppercase tracking-wider">Summary Statement</label>
+              <label htmlFor="personal-summary" className="block text-[10px] font-bold text-muted uppercase tracking-wider">Summary Statement</label>
               <span className="text-[10px] font-semibold text-muted">{(data.summary || '').length} characters</span>
             </div>
             <textarea
+              id="personal-summary"
               rows="4"
               value={data.summary || ''}
               onChange={(e) => updateSummary(e.target.value)}
@@ -396,6 +404,7 @@ export function ResumeForm({
               variant="secondary"
               size="sm"
               className="w-full h-9 border-slate-800 border bg-surface hover:bg-slate-800/80 text-[11px] font-semibold gap-1.5"
+              aria-label="Generate professional summary using profile context"
             >
               <Sparkles className="h-3.5 w-3.5 text-primary" /> Generate Professional Summary
             </Button>
@@ -406,14 +415,16 @@ export function ResumeForm({
         <SectionAccordion title="Skills" icon={Cpu}>
           <div className="text-xs space-y-4">
             <form onSubmit={handleAddSkill} className="flex gap-2">
+              <label htmlFor="skillInput" className="sr-only">Add Skill</label>
               <input
+                id="skillInput"
                 type="text"
                 value={skillInput}
                 onChange={(e) => setSkillInput(e.target.value)}
                 className="flex-grow bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-text focus:outline-none focus:border-primary transition-colors font-semibold"
                 placeholder="e.g. Next.js"
               />
-              <Button type="submit" size="sm" className="h-9 shrink-0 gap-1 text-xs font-semibold">
+              <Button type="submit" size="sm" className="h-9 shrink-0 gap-1 text-xs font-semibold" aria-label="Add entered skill">
                 <Plus className="h-4 w-4" /> Add Skill
               </Button>
             </form>
@@ -427,6 +438,7 @@ export function ResumeForm({
                       type="button"
                       onClick={() => handleRemoveSkill(skill)}
                       className="text-muted hover:text-red-400 transition-colors cursor-pointer text-xs font-bold leading-none"
+                      aria-label={`Remove ${skill} skill`}
                     >
                       &times;
                     </button>
@@ -448,6 +460,7 @@ export function ResumeForm({
                       type="button"
                       onClick={() => handleAddSuggestedSkill(s)}
                       className="px-2.5 py-1 rounded-full bg-primary/5 hover:bg-primary/10 border border-primary/20 hover:border-primary/40 text-[10px] font-semibold text-primary-light transition-all cursor-pointer"
+                      aria-label={`Add suggested skill ${s}`}
                     >
                       + {s}
                     </button>
@@ -469,14 +482,16 @@ export function ResumeForm({
                     onClick={() => deleteExperience(index)}
                     className="absolute top-4 right-4 text-muted hover:text-red-400 transition-colors"
                     title="Delete Entry"
+                    aria-label={`Delete experience entry ${index + 1}`}
                   >
                     <Trash2 className="h-4 w-4" />
                   </button>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-[10px] font-bold text-muted uppercase tracking-wider mb-1">Company / Organization</label>
+                      <label htmlFor={`exp-company-${index}`} className="block text-[10px] font-bold text-muted uppercase tracking-wider mb-1">Company / Organization</label>
                       <input
+                        id={`exp-company-${index}`}
                         type="text"
                         value={exp.company}
                         onChange={(e) => updateExperience(index, 'company', e.target.value)}
@@ -485,8 +500,9 @@ export function ResumeForm({
                       />
                     </div>
                     <div>
-                      <label className="block text-[10px] font-bold text-muted uppercase tracking-wider mb-1">Role / Job Title</label>
+                      <label htmlFor={`exp-role-${index}`} className="block text-[10px] font-bold text-muted uppercase tracking-wider mb-1">Role / Job Title</label>
                       <input
+                        id={`exp-role-${index}`}
                         type="text"
                         value={exp.role}
                         onChange={(e) => updateExperience(index, 'role', e.target.value)}
@@ -495,8 +511,9 @@ export function ResumeForm({
                       />
                     </div>
                     <div>
-                      <label className="block text-[10px] font-bold text-muted uppercase tracking-wider mb-1">Start Date</label>
+                      <label htmlFor={`exp-startDate-${index}`} className="block text-[10px] font-bold text-muted uppercase tracking-wider mb-1">Start Date</label>
                       <input
+                        id={`exp-startDate-${index}`}
                         type="text"
                         value={exp.startDate}
                         onChange={(e) => updateExperience(index, 'startDate', e.target.value)}
@@ -505,8 +522,9 @@ export function ResumeForm({
                       />
                     </div>
                     <div>
-                      <label className="block text-[10px] font-bold text-muted uppercase tracking-wider mb-1">End Date</label>
+                      <label htmlFor={`exp-endDate-${index}`} className="block text-[10px] font-bold text-muted uppercase tracking-wider mb-1">End Date</label>
                       <input
+                        id={`exp-endDate-${index}`}
                         type="text"
                         value={exp.endDate}
                         onChange={(e) => updateExperience(index, 'endDate', e.target.value)}
@@ -516,16 +534,18 @@ export function ResumeForm({
                     </div>
                     <div className="col-span-1 sm:col-span-2 space-y-2">
                       <div className="flex justify-between items-center">
-                        <label className="block text-[10px] font-bold text-muted uppercase tracking-wider">Responsibilities / Bullet Points</label>
+                        <label htmlFor={`exp-description-${index}`} className="block text-[10px] font-bold text-muted uppercase tracking-wider">Responsibilities / Bullet Points</label>
                         <button
                           type="button"
                           onClick={() => handleGenerateBullets(index)}
                           className="text-[10px] font-bold text-primary hover:text-primary-light flex items-center gap-1 transition-colors cursor-pointer"
+                          aria-label={`Generate achievement bullets for experience entry ${index + 1}`}
                         >
                           <Sparkles className="h-3 w-3" /> Generate Achievement Bullets
                         </button>
                       </div>
                       <textarea
+                        id={`exp-description-${index}`}
                         rows="3"
                         value={exp.description}
                         onChange={(e) => updateExperience(index, 'description', e.target.value)}
@@ -547,6 +567,7 @@ export function ResumeForm({
               onClick={addExperience}
               variant="secondary"
               className="w-full h-10 border-slate-800 border bg-surface hover:bg-slate-800/80 text-xs font-semibold gap-1.5"
+              aria-label="Add new experience entry"
             >
               <Plus className="h-4 w-4 text-primary" /> Add Experience Entry
             </Button>
@@ -564,14 +585,16 @@ export function ResumeForm({
                     onClick={() => deleteProject(index)}
                     className="absolute top-4 right-4 text-muted hover:text-red-400 transition-colors"
                     title="Delete Entry"
+                    aria-label={`Delete project entry ${index + 1}`}
                   >
                     <Trash2 className="h-4 w-4" />
                   </button>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-[10px] font-bold text-muted uppercase tracking-wider mb-1">Project Name</label>
+                      <label htmlFor={`proj-name-${index}`} className="block text-[10px] font-bold text-muted uppercase tracking-wider mb-1">Project Name</label>
                       <input
+                        id={`proj-name-${index}`}
                         type="text"
                         value={proj.projectName}
                         onChange={(e) => updateProject(index, 'projectName', e.target.value)}
@@ -580,8 +603,9 @@ export function ResumeForm({
                       />
                     </div>
                     <div>
-                      <label className="block text-[10px] font-bold text-muted uppercase tracking-wider mb-1">Tech Stack Summary</label>
+                      <label htmlFor={`proj-tech-${index}`} className="block text-[10px] font-bold text-muted uppercase tracking-wider mb-1">Tech Stack Summary</label>
                       <input
+                        id={`proj-tech-${index}`}
                         type="text"
                         value={proj.techStack}
                         onChange={(e) => updateProject(index, 'techStack', e.target.value)}
@@ -590,8 +614,9 @@ export function ResumeForm({
                       />
                     </div>
                     <div className="col-span-1 sm:col-span-2">
-                      <label className="block text-[10px] font-bold text-muted uppercase tracking-wider mb-1">GitHub Link URL</label>
+                      <label htmlFor={`proj-git-${index}`} className="block text-[10px] font-bold text-muted uppercase tracking-wider mb-1">GitHub Link URL</label>
                       <input
+                        id={`proj-git-${index}`}
                         type="text"
                         value={proj.githubLink}
                         onChange={(e) => updateProject(index, 'githubLink', e.target.value)}
@@ -600,8 +625,9 @@ export function ResumeForm({
                       />
                     </div>
                     <div className="col-span-1 sm:col-span-2">
-                      <label className="block text-[10px] font-bold text-muted uppercase tracking-wider mb-1">Project Description</label>
+                      <label htmlFor={`proj-desc-${index}`} className="block text-[10px] font-bold text-muted uppercase tracking-wider mb-1">Project Description</label>
                       <textarea
+                        id={`proj-desc-${index}`}
                         rows="3.5"
                         value={proj.description}
                         onChange={(e) => updateProject(index, 'description', e.target.value)}
@@ -623,6 +649,7 @@ export function ResumeForm({
               onClick={addProject}
               variant="secondary"
               className="w-full h-10 border-slate-800 border bg-surface hover:bg-slate-800/80 text-xs font-semibold gap-1.5"
+              aria-label="Add new project entry"
             >
               <Plus className="h-4 w-4 text-primary" /> Add Project Entry
             </Button>
@@ -640,14 +667,16 @@ export function ResumeForm({
                     onClick={() => deleteEducation(index)}
                     className="absolute top-4 right-4 text-muted hover:text-red-400 transition-colors"
                     title="Delete Entry"
+                    aria-label={`Delete education entry ${index + 1}`}
                   >
                     <Trash2 className="h-4 w-4" />
                   </button>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div className="col-span-1 sm:col-span-2">
-                      <label className="block text-[10px] font-bold text-muted uppercase tracking-wider mb-1">College / University Name</label>
+                      <label htmlFor={`edu-college-${index}`} className="block text-[10px] font-bold text-muted uppercase tracking-wider mb-1">College / University Name</label>
                       <input
+                        id={`edu-college-${index}`}
                         type="text"
                         value={edu.college}
                         onChange={(e) => updateEducation(index, 'college', e.target.value)}
@@ -656,8 +685,9 @@ export function ResumeForm({
                       />
                     </div>
                     <div>
-                      <label className="block text-[10px] font-bold text-muted uppercase tracking-wider mb-1">Degree / Certification</label>
+                      <label htmlFor={`edu-degree-${index}`} className="block text-[10px] font-bold text-muted uppercase tracking-wider mb-1">Degree / Certification</label>
                       <input
+                        id={`edu-degree-${index}`}
                         type="text"
                         value={edu.degree}
                         onChange={(e) => updateEducation(index, 'degree', e.target.value)}
@@ -668,8 +698,9 @@ export function ResumeForm({
                     <div>
                       <div className="grid grid-cols-2 gap-2">
                         <div>
-                          <label className="block text-[10px] font-bold text-muted uppercase tracking-wider mb-1">Start Year</label>
+                          <label htmlFor={`edu-startYear-${index}`} className="block text-[10px] font-bold text-muted uppercase tracking-wider mb-1">Start Year</label>
                           <input
+                            id={`edu-startYear-${index}`}
                             type="text"
                             value={edu.startYear}
                             onChange={(e) => updateEducation(index, 'startYear', e.target.value)}
@@ -678,8 +709,9 @@ export function ResumeForm({
                           />
                         </div>
                         <div>
-                          <label className="block text-[10px] font-bold text-muted uppercase tracking-wider mb-1">End Year</label>
+                          <label htmlFor={`edu-endYear-${index}`} className="block text-[10px] font-bold text-muted uppercase tracking-wider mb-1">End Year</label>
                           <input
+                            id={`edu-endYear-${index}`}
                             type="text"
                             value={edu.endYear}
                             onChange={(e) => updateEducation(index, 'endYear', e.target.value)}
@@ -694,7 +726,7 @@ export function ResumeForm({
               ))
             ) : (
               <div className="text-center py-6 border border-dashed border-slate-850 rounded-xl text-muted text-xs font-semibold">
-                No education entries added.
+                No education history added yet. Add your academic qualifications.
               </div>
             )}
 
@@ -703,6 +735,7 @@ export function ResumeForm({
               onClick={addEducation}
               variant="secondary"
               className="w-full h-10 border-slate-800 border bg-surface hover:bg-slate-800/80 text-xs font-semibold gap-1.5"
+              aria-label="Add new education entry"
             >
               <Plus className="h-4 w-4 text-primary" /> Add Education Entry
             </Button>

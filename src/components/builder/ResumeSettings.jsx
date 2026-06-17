@@ -1,8 +1,10 @@
-import React from 'react';
-import { Settings } from 'lucide-react';
+import React, { useState } from 'react';
+import { Settings, Loader2 } from 'lucide-react';
 import { SectionAccordion } from './SectionAccordion';
 
 export function ResumeSettings({ settings, onSettingsChange }) {
+  const [isApplying, setIsApplying] = useState(false);
+
   const colors = [
     { name: 'Indigo', value: 'indigo', class: 'bg-[#6366F1]' },
     { name: 'Blue', value: 'blue', class: 'bg-[#3B82F6]' },
@@ -23,6 +25,10 @@ export function ResumeSettings({ settings, onSettingsChange }) {
       ...settings,
       [field]: value
     });
+    setIsApplying(true);
+    setTimeout(() => {
+      setIsApplying(false);
+    }, 400);
   };
 
   return (
@@ -91,7 +97,15 @@ export function ResumeSettings({ settings, onSettingsChange }) {
             ))}
           </div>
         </div>
+
+        {isApplying && (
+          <div className="flex items-center gap-1.5 text-[10px] text-primary font-bold uppercase tracking-wider animate-pulse pt-2 border-t border-slate-900/40">
+            <Loader2 className="h-3 w-3 animate-spin" />
+            <span>Applying customization settings...</span>
+          </div>
+        )}
       </div>
     </SectionAccordion>
   );
 }
+

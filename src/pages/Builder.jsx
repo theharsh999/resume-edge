@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Layout } from '../components/layout/Layout';
 import { Container } from '../components/ui/Container';
 import { Badge } from '../components/ui/Badge';
@@ -169,19 +169,35 @@ export function Builder() {
 
   // Sync state variables to local storage
   useEffect(() => {
-    localStorage.setItem(LOCAL_STORAGE_KEY_DATA, JSON.stringify(resumeData));
+    try {
+      localStorage.setItem(LOCAL_STORAGE_KEY_DATA, JSON.stringify(resumeData));
+    } catch (e) {
+      console.warn('LocalStorage write blocked:', e);
+    }
   }, [resumeData]);
 
   useEffect(() => {
-    localStorage.setItem(LOCAL_STORAGE_KEY_TPL, template);
+    try {
+      localStorage.setItem(LOCAL_STORAGE_KEY_TPL, template);
+    } catch (e) {
+      console.warn('LocalStorage write blocked:', e);
+    }
   }, [template]);
 
   useEffect(() => {
-    localStorage.setItem(LOCAL_STORAGE_KEY_SETTINGS, JSON.stringify(settings));
+    try {
+      localStorage.setItem(LOCAL_STORAGE_KEY_SETTINGS, JSON.stringify(settings));
+    } catch (e) {
+      console.warn('LocalStorage write blocked:', e);
+    }
   }, [settings]);
 
   useEffect(() => {
-    localStorage.setItem(LOCAL_STORAGE_KEY_ORDER, JSON.stringify(sectionOrder));
+    try {
+      localStorage.setItem(LOCAL_STORAGE_KEY_ORDER, JSON.stringify(sectionOrder));
+    } catch (e) {
+      console.warn('LocalStorage write blocked:', e);
+    }
   }, [sectionOrder]);
 
   const handleTemplateChange = (newTpl) => {
@@ -215,46 +231,46 @@ export function Builder() {
   };
 
   // Programmatic calculations for builder analytics
-  const calculateATSScore = () => {
-    let score = 0;
+  const score = useMemo(() => {
+    let pts = 0;
     const p = resumeData.personal || {};
     
     // Personal Info check: +15 max
-    if (p.fullName) score += 3;
-    if (p.email) score += 3;
-    if (p.phone) score += 3;
-    if (p.location) score += 2;
-    if (p.linkedin) score += 2;
-    if (p.github) score += 2;
+    if (p.fullName) pts += 3;
+    if (p.email) pts += 3;
+    if (p.phone) pts += 3;
+    if (p.location) pts += 2;
+    if (p.linkedin) pts += 2;
+    if (p.github) pts += 2;
 
     // Summary statement check: +15 max
     const summaryLen = (resumeData.summary || '').trim().length;
-    if (summaryLen >= 80) score += 15;
-    else if (summaryLen > 0) score += 10;
+    if (summaryLen >= 80) pts += 15;
+    else if (summaryLen > 0) pts += 10;
 
     // Technical skills count: +20 max
     const skillsCount = (resumeData.skills || []).length;
-    if (skillsCount >= 5) score += 20;
-    else if (skillsCount > 0) score += 10;
+    if (skillsCount >= 5) pts += 20;
+    else if (skillsCount > 0) pts += 10;
 
     // Education details: +15 max
     const eduCount = (resumeData.education || []).length;
-    if (eduCount >= 1) score += 15;
+    if (eduCount >= 1) pts += 15;
 
     // Experience logs: +20 max
     const expCount = (resumeData.experience || []).length;
-    if (expCount >= 2) score += 20;
-    else if (expCount === 1) score += 10;
+    if (expCount >= 2) pts += 20;
+    else if (expCount === 1) pts += 10;
 
     // Projects showcases: +15 max
     const projCount = (resumeData.projects || []).length;
-    if (projCount >= 2) score += 15;
-    else if (projCount === 1) score += 10;
+    if (projCount >= 2) pts += 15;
+    else if (projCount === 1) pts += 10;
 
-    return score;
-  };
+    return pts;
+  }, [resumeData]);
 
-  const calculateCompletion = () => {
+  const completion = useMemo(() => {
     let total = 0;
     const p = resumeData.personal || {};
 
@@ -284,9 +300,9 @@ export function Builder() {
     if ((resumeData.projects || []).length >= 1) total += 10;
 
     return total;
-  };
+  }, [resumeData]);
 
-  const getInsights = () => {
+  const insights = useMemo(() => {
     const list = [];
     const p = resumeData.personal || {};
 
@@ -323,9 +339,9 @@ export function Builder() {
     }
 
     return list;
-  };
+  }, [resumeData]);
 
-  const getRecruiterChecklist = () => {
+  const checklist = useMemo(() => {
     const p = resumeData.personal || {};
     return [
       { label: 'Full Name & Role Title', checked: !!(p.fullName && p.role) },
@@ -337,14 +353,12 @@ export function Builder() {
       { label: 'LinkedIn Profile Connected', checked: !!(p.linkedin && p.linkedin.trim().length > 0) },
       { label: 'GitHub Profile Connected', checked: !!(p.github && p.github.trim().length > 0) },
     ];
-  };
+  }, [resumeData]);
 
-  // Variable aggregates
-  const score = calculateATSScore();
-  const completion = calculateCompletion();
-  const insights = getInsights();
-  const checklist = getRecruiterChecklist();
-  const exportFilename = `ResumeEdge-${(resumeData.personal.fullName || 'Candidate').trim().replace(/\s+/g, '_')}.pdf`;
+  const exportFilename = useMemo(() => {
+    const nameStr = (resumeData.personal && resumeData.personal.fullName || 'Candidate').trim();
+    return `ResumeEdge-${nameStr.replace(/\s+/g, '_')}.pdf`;
+  }, [resumeData.personal.fullName]);
 
   return (
     <Layout>
