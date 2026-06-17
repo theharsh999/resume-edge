@@ -102,3 +102,132 @@
     box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
   }
 }
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Light Mode Theme System
+   ─────────────────────────────────────────────────────────────────────────── */
+
+html.light {
+  color-scheme: light;
+  --color-background: #F8FAFC;
+  --color-surface: #FFFFFF;
+  --color-text: #0F172A;
+  --color-muted: #64748B;
+}
+
+/* Light mode overrides for app chrome and layout (excluding printable resume) */
+html.light body {
+  background-color: #F8FAFC !important;
+  color: #0F172A !important;
+  background-image: 
+    radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.03) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, rgba(139, 92, 246, 0.03) 0px, transparent 50%) !important;
+}
+
+html.light nav.bg-background\/80 {
+  background-color: rgba(255, 255, 255, 0.8) !important;
+  border-color: #E2E8F0 !important;
+}
+
+html.light .border-slate-900:not(#resume-print-content *),
+html.light .border-slate-800:not(#resume-print-content *),
+html.light .border-slate-850:not(#resume-print-content *),
+html.light .border-slate-700:not(#resume-print-content *),
+html.light .border-slate-800\/80:not(#resume-print-content *),
+html.light .border-slate-800\/60:not(#resume-print-content *),
+html.light .border-slate-700\/80:not(#resume-print-content *),
+html.light .border-slate-850\/80:not(#resume-print-content *),
+html.light .border-slate-900\/60:not(#resume-print-content *),
+html.light .border-slate-900\/40:not(#resume-print-content *) {
+  border-color: #E2E8F0 !important;
+}
+
+html.light .bg-slate-900:not(#resume-print-content *),
+html.light .bg-slate-950:not(#resume-print-content *),
+html.light .bg-slate-950\/20:not(#resume-print-content *),
+html.light .bg-slate-950\/30:not(#resume-print-content *),
+html.light .bg-slate-950\/40:not(#resume-print-content *),
+html.light .bg-slate-950\/60:not(#resume-print-content *),
+html.light .bg-slate-900\/60:not(#resume-print-content *),
+html.light .bg-slate-900\/40:not(#resume-print-content *),
+html.light .bg-slate-900\/20:not(#resume-print-content *),
+html.light .bg-slate-950\/45:not(#resume-print-content *),
+html.light .bg-slate-900\/80:not(#resume-print-content *),
+html.light .bg-slate-800\/80:not(#resume-print-content *) {
+  background-color: #FFFFFF !important;
+}
+
+html.light .text-text:not(#resume-print-content *),
+html.light h1:not(#resume-print-content *),
+html.light h2:not(#resume-print-content *),
+html.light h3:not(#resume-print-content *) {
+  color: #0F172A !important;
+}
+
+html.light .text-muted:not(#resume-print-content *) {
+  color: #64748B !important;
+}
+
+html.light .text-slate-300:not(#resume-print-content *),
+html.light .text-slate-400:not(#resume-print-content *) {
+  color: #475569 !important;
+}
+
+html.light .text-slate-200:not(#resume-print-content *) {
+  color: #1E293B !important;
+}
+
+html.light .hover\:bg-slate-800:hover:not(#resume-print-content *),
+html.light .hover\:bg-slate-900:hover:not(#resume-print-content *),
+html.light .hover\:bg-slate-700\/80:hover:not(#resume-print-content *),
+html.light .group:hover .group-hover\:bg-slate-850:not(#resume-print-content *) {
+  background-color: #F1F5F9 !important;
+}
+
+/* Fix text contrast in forms, inputs and buttons for light mode */
+html.light input:not(#resume-print-content *),
+html.light textarea:not(#resume-print-content *),
+html.light select:not(#resume-print-content *) {
+  background-color: #FFFFFF !important;
+  color: #0F172A !important;
+  border-color: #E2E8F0 !important;
+}
+
+html.light input:focus:not(#resume-print-content *),
+html.light textarea:focus:not(#resume-print-content *),
+html.light select:focus:not(#resume-print-content *) {
+  border-color: #6366F1 !important;
+}
+
+/* Builder layout elements */
+html.light .bg-slate-900\/50,
+html.light .bg-slate-950\/30,
+html.light .bg-slate-950\/10 {
+  background-color: #F8FAFC !important;
+}
+
+/* Chrome buttons */
+html.light button.bg-slate-950\/40,
+html.light button.bg-slate-900:not(#resume-print-content *) {
+  background-color: #F1F5F9 !important;
+  color: #0F172A !important;
+  border-color: #E2E8F0 !important;
+}
+
+html.light button.bg-slate-950\/40:hover,
+html.light button.bg-slate-900:hover:not(#resume-print-content *) {
+  background-color: #E2E8F0 !important;
+}
+
+/* Ensure secondary buttons and dropdown cards render cleanly */
+html.light .bg-slate-900\/60,
+html.light .bg-slate-900:not(#resume-print-content *) {
+  background-color: #F1F5F9 !important;
+  color: #0F172A !important;
+}
+
+/* Extra overrides for builder header and borders */
+html.light .border-slate-900\/60,
+html.light .border-slate-900\/40 {
+  border-color: #E2E8F0 !important;
+}

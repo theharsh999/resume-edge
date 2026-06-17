@@ -1,13 +1,29 @@
 import React, { useState } from 'react';
 import { NavLink, Link } from 'react-router-dom';
-import { Menu, X, FileText } from 'lucide-react';
+import { Menu, X, FileText, Sun, Moon } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { Container } from '../ui/Container';
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const [theme, setTheme] = useState(() => {
+    return localStorage.getItem('theme') || 'dark';
+  });
 
   const toggleMenu = () => setIsOpen(!isOpen);
+
+  const toggleTheme = () => {
+    const nextTheme = theme === 'dark' ? 'light' : 'dark';
+    setTheme(nextTheme);
+    localStorage.setItem('theme', nextTheme);
+    if (nextTheme === 'light') {
+      document.documentElement.classList.add('light');
+      document.documentElement.classList.remove('dark');
+    } else {
+      document.documentElement.classList.add('dark');
+      document.documentElement.classList.remove('light');
+    }
+  };
 
   const navLinks = [
     { name: 'Home', path: '/' },
@@ -45,15 +61,29 @@ export function Navbar() {
             ))}
           </div>
 
-          {/* Desktop CTA */}
-          <div className="hidden md:flex items-center">
+          {/* Desktop CTA & Theme Toggle */}
+          <div className="hidden md:flex items-center space-x-4">
+            <button
+              onClick={toggleTheme}
+              className="p-2 rounded-lg text-muted hover:text-text hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors duration-200 cursor-pointer"
+              aria-label="Toggle theme"
+            >
+              {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+            </button>
             <Link to="/builder">
               <Button size="sm">Start Building</Button>
             </Link>
           </div>
 
-          {/* Mobile menu button */}
-          <div className="md:hidden">
+          {/* Mobile menu button & theme toggle */}
+          <div className="flex items-center md:hidden gap-2">
+            <button
+              onClick={toggleTheme}
+              className="p-2 rounded-lg text-muted hover:text-text hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors duration-200 cursor-pointer"
+              aria-label="Toggle theme"
+            >
+              {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+            </button>
             <button
               onClick={toggleMenu}
               className="inline-flex items-center justify-center rounded-md p-2 text-muted hover:bg-slate-800 hover:text-text focus:outline-none transition-colors duration-200"
