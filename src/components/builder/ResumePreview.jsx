@@ -74,20 +74,20 @@ export function ResumePreview({
   const densityStyles = {
     comfortable: {
       padding: 'p-8 md:p-10',
-      spacing: 'space-y-7',
+      spacing: 'space-y-8',
       itemSpacing: 'space-y-5',
       sectionSpacing: 'space-y-3'
     },
     balanced: {
       padding: 'p-6 md:p-8',
-      spacing: 'space-y-5',
+      spacing: 'space-y-6',
       itemSpacing: 'space-y-4',
       sectionSpacing: 'space-y-2'
     },
     compact: {
       padding: 'p-4 md:p-5',
-      spacing: 'space-y-3.5',
-      itemSpacing: 'space-y-2.5',
+      spacing: 'space-y-4',
+      itemSpacing: 'space-y-3',
       sectionSpacing: 'space-y-1.5'
     }
   };
@@ -106,10 +106,10 @@ export function ResumePreview({
   // Section Renders
   const renderSummary = () => (
     <div key="summary" className={density.sectionSpacing}>
-      <h4 className={`text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-200 pb-0.5`}>
+      <h4 className={`text-[12.5px] font-bold text-slate-800 uppercase tracking-wider border-b border-slate-300 pb-0.5`}>
         Professional Summary
       </h4>
-      <p className="text-[11px] text-slate-700 leading-relaxed font-medium">{summary}</p>
+      <p className="text-[11px] text-slate-800 leading-relaxed font-medium">{summary}</p>
     </div>
   );
 
@@ -117,17 +117,17 @@ export function ResumePreview({
     if (!hasSkills) return null;
     return (
       <div key="skills" className={density.sectionSpacing}>
-        <h4 className={`text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-200 pb-0.5`}>
+        <h4 className={`text-[12.5px] font-bold text-slate-800 uppercase tracking-wider border-b border-slate-300 pb-0.5`}>
           Skills
         </h4>
         {asList ? (
-          <p className="text-[11px] text-slate-700 leading-relaxed font-medium">
+          <p className="text-[11px] text-slate-800 leading-relaxed font-medium">
             {skills.join(', ')}
           </p>
         ) : (
           <div className="flex flex-wrap gap-1 pt-0.5">
             {skills.map((skill, idx) => (
-              <Badge key={idx} variant="muted" className="text-[9px] bg-slate-100 border-slate-200 py-0.5 px-2 font-medium text-slate-700">
+              <Badge key={idx} variant="muted" className="text-[9px] bg-slate-100 border-slate-200 py-0.5 px-2 font-semibold text-slate-800">
                 {skill}
               </Badge>
             ))}
@@ -139,19 +139,19 @@ export function ResumePreview({
 
   const renderExperience = (showBullets = true) => (
     <div key="experience" className={density.sectionSpacing}>
-      <h4 className={`text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-200 pb-0.5`}>
+      <h4 className={`text-[12.5px] font-bold text-slate-800 uppercase tracking-wider border-b border-slate-300 pb-0.5`}>
         Experience
       </h4>
       <div className={density.itemSpacing}>
         {experience.map((exp, idx) => (
           <div key={idx} className="text-[11px]">
             <div className="flex justify-between items-baseline font-bold">
-              <span className="text-slate-900">{exp.company}</span>
-              <span className="text-[10px] text-slate-500 font-medium">{exp.startDate} – {exp.endDate}</span>
+              <span className="text-[11px] text-slate-900 font-bold">{exp.company}</span>
+              <span className="text-[10px] text-slate-600 font-semibold">{exp.startDate} – {exp.endDate}</span>
             </div>
-            <div className={`${colors.textLight} font-semibold`}>{exp.role}</div>
+            <div className={`text-[11px] ${colors.text} font-bold`}>{exp.role}</div>
             {exp.description && (
-              <p className="text-[10px] text-slate-600 mt-1 leading-relaxed whitespace-pre-line font-medium">
+              <p className="text-[11px] text-slate-800 mt-1 leading-relaxed whitespace-pre-line font-medium">
                 {exp.description}
               </p>
             )}
@@ -163,14 +163,14 @@ export function ResumePreview({
 
   const renderProjects = () => (
     <div key="projects" className={density.sectionSpacing}>
-      <h4 className={`text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-200 pb-0.5`}>
+      <h4 className={`text-[12.5px] font-bold text-slate-800 uppercase tracking-wider border-b border-slate-300 pb-0.5`}>
         Projects
       </h4>
       <div className={density.itemSpacing}>
         {projects.map((proj, idx) => (
           <div key={idx} className="text-[11px]">
             <div className="flex justify-between items-baseline font-bold">
-              <span className="text-slate-900">{proj.projectName}</span>
+              <span className="text-[11px] text-slate-900 font-bold">{proj.projectName}</span>
               {proj.githubLink && (
                 <span className={`text-[10px] ${colors.text} hover:underline font-semibold`}>
                   {proj.githubLink.replace(/^https?:\/\/(www\.)?github\.com\//, '')}
@@ -178,10 +178,10 @@ export function ResumePreview({
               )}
             </div>
             {proj.techStack && (
-              <div className="text-[10px] text-slate-500 font-semibold mt-0.5">Tech Stack: {proj.techStack}</div>
+              <div className="text-[10px] text-slate-600 font-bold mt-0.5">Tech Stack: {proj.techStack}</div>
             )}
             {proj.description && (
-              <p className="text-[10px] text-slate-600 mt-1 leading-relaxed font-medium">
+              <p className="text-[11px] text-slate-800 mt-1 leading-relaxed font-medium">
                 {proj.description}
               </p>
             )}
@@ -193,17 +193,17 @@ export function ResumePreview({
 
   const renderEducation = () => (
     <div key="education" className={density.sectionSpacing}>
-      <h4 className={`text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-200 pb-0.5`}>
+      <h4 className={`text-[12.5px] font-bold text-slate-800 uppercase tracking-wider border-b border-slate-300 pb-0.5`}>
         Education
       </h4>
       <div className="space-y-2">
         {education.map((edu, idx) => (
           <div key={idx} className="flex justify-between items-baseline text-[11px]">
             <div>
-              <span className="font-bold text-slate-900">{edu.degree}</span>
-              <span className="text-slate-500 block text-[10px] font-semibold">{edu.college}</span>
+              <span className="text-[11px] font-bold text-slate-900">{edu.degree}</span>
+              <span className="text-slate-600 block text-[10px] font-bold">{edu.college}</span>
             </div>
-            <span className="text-[10px] text-slate-500 shrink-0 font-medium">{edu.startYear} – {edu.endYear}</span>
+            <span className="text-[10px] text-slate-600 shrink-0 font-semibold">{edu.startYear} – {edu.endYear}</span>
           </div>
         ))}
       </div>
@@ -225,25 +225,25 @@ export function ResumePreview({
   const renderModernTemplate = () => (
     <div className="flex flex-col md:flex-row h-full">
       {/* Left Sidebar */}
-      <div className="w-full md:w-[32%] border-b md:border-b-0 md:border-r border-slate-200 p-5 space-y-5 shrink-0 bg-slate-50">
+      <div className="w-full md:w-[25%] border-b md:border-b-0 md:border-r border-slate-200 p-5 space-y-6 shrink-0 bg-slate-50">
         {/* Contact info */}
         <div className="space-y-3 text-left">
-          <h4 className={`text-[10px] font-bold ${colors.text} uppercase tracking-wider border-b border-slate-200 pb-1 font-semibold`}>Contact</h4>
-          <div className="space-y-2.5 text-[11px] break-all font-medium text-slate-700">
-            {personal.email && <div className="flex items-center gap-2"><Mail className="h-3.5 w-3.5 text-slate-400 shrink-0" /><span>{personal.email}</span></div>}
-            {personal.phone && <div className="flex items-center gap-2"><Phone className="h-3.5 w-3.5 text-slate-400 shrink-0" /><span>{personal.phone}</span></div>}
-            {personal.location && <div className="flex items-center gap-2"><MapPin className="h-3.5 w-3.5 text-slate-400 shrink-0" /><span>{personal.location}</span></div>}
-            {personal.linkedin && <div className="flex items-center gap-2"><Linkedin className="h-3.5 w-3.5 text-slate-400 shrink-0" /><span className="truncate">{personal.linkedin.replace(/^https?:\/\/(www\.)?/, '')}</span></div>}
-            {personal.github && <div className="flex items-center gap-2"><Github className="h-3.5 w-3.5 text-slate-400 shrink-0" /><span className="truncate">{personal.github.replace(/^https?:\/\/(www\.)?/, '')}</span></div>}
+          <h4 className={`text-[12.5px] font-bold ${colors.text} uppercase tracking-wider border-b border-slate-200 pb-1`}>Contact</h4>
+          <div className="space-y-2.5 text-[11px] break-all font-medium text-slate-800">
+            {personal.email && <div className="flex items-center gap-2"><Mail className="h-3.5 w-3.5 text-slate-600 shrink-0" /><span>{personal.email}</span></div>}
+            {personal.phone && <div className="flex items-center gap-2"><Phone className="h-3.5 w-3.5 text-slate-600 shrink-0" /><span>{personal.phone}</span></div>}
+            {personal.location && <div className="flex items-center gap-2"><MapPin className="h-3.5 w-3.5 text-slate-600 shrink-0" /><span>{personal.location}</span></div>}
+            {personal.linkedin && <div className="flex items-center gap-2"><Linkedin className="h-3.5 w-3.5 text-slate-600 shrink-0" /><span className="truncate">{personal.linkedin.replace(/^https?:\/\/(www\.)?/, '')}</span></div>}
+            {personal.github && <div className="flex items-center gap-2"><Github className="h-3.5 w-3.5 text-slate-600 shrink-0" /><span className="truncate">{personal.github.replace(/^https?:\/\/(www\.)?/, '')}</span></div>}
           </div>
         </div>
 
         {/* Skills sidebar */}
         <div className="space-y-3 text-left">
-          <h4 className={`text-[10px] font-bold ${colors.text} uppercase tracking-wider border-b border-slate-200 pb-1 font-semibold`}>Skills</h4>
+          <h4 className={`text-[12.5px] font-bold ${colors.text} uppercase tracking-wider border-b border-slate-200 pb-1`}>Skills</h4>
           <div className="flex flex-wrap gap-1.5 pt-0.5">
             {skills.map((s, idx) => (
-              <Badge key={idx} variant="muted" className="text-[9px] bg-slate-100 border-slate-200 py-0.5 px-2 font-medium text-slate-700">
+              <Badge key={idx} variant="muted" className="text-[9px] bg-slate-100 border-slate-200 py-0.5 px-2 font-semibold text-slate-800">
                 {s}
               </Badge>
             ))}
@@ -254,8 +254,8 @@ export function ResumePreview({
       {/* Right Column Body */}
       <div className={`flex-grow ${density.padding} ${density.spacing}`}>
         <div className="space-y-1 text-left border-b border-slate-200 pb-3">
-          <h3 className="text-2xl font-extrabold tracking-tight text-slate-900">{personal.fullName || 'Your Name'}</h3>
-          <p className={`text-xs ${colors.text} font-bold tracking-wide uppercase`}>{personal.role || 'Professional Role'}</p>
+          <h3 className="text-[30px] leading-tight font-extrabold tracking-tight text-slate-900">{personal.fullName || 'Your Name'}</h3>
+          <p className={`text-[15px] ${colors.text} font-bold tracking-wide uppercase`}>{personal.role || 'Professional Role'}</p>
         </div>
         {/* Render sections in custom order (excluding skills which is in sidebar) */}
         {sectionOrder.filter(id => id !== 'skills').map(id => renderSection(id))}
@@ -267,9 +267,9 @@ export function ResumePreview({
   const renderProfessionalTemplate = () => (
     <div className={`font-serif ${density.padding} ${density.spacing}`}>
       <div className="text-center border-b border-slate-200 pb-3 space-y-1.5">
-        <h3 className="text-2xl font-semibold tracking-wide text-slate-900">{personal.fullName || 'Your Name'}</h3>
-        <p className={`text-xs italic ${colors.text} font-semibold tracking-wide`}>{personal.role || 'Professional Role'}</p>
-        <div className="flex flex-wrap justify-center gap-x-3 gap-y-1 text-[10px] text-slate-500 font-medium font-sans">
+        <h3 className="text-[30px] leading-tight font-semibold tracking-wide text-slate-900">{personal.fullName || 'Your Name'}</h3>
+        <p className={`text-[15px] italic ${colors.text} font-semibold tracking-wide`}>{personal.role || 'Professional Role'}</p>
+        <div className="flex flex-wrap justify-center gap-x-3 gap-y-1 text-[10px] text-slate-600 font-semibold font-sans">
           {personal.email && <span>{personal.email}</span>}
           {personal.phone && (
             <>
@@ -306,10 +306,10 @@ export function ResumePreview({
     <div className={`${density.padding} ${density.spacing}`}>
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-200 pb-4 gap-2">
         <div className="space-y-0.5 text-left">
-          <h3 className="text-xl font-bold tracking-tight text-slate-900">{personal.fullName || 'Your Name'}</h3>
-          <p className={`text-xs ${colors.text} font-bold tracking-wide`}>{personal.role || 'Professional Role'}</p>
+          <h3 className="text-[30px] leading-tight font-bold tracking-tight text-slate-900">{personal.fullName || 'Your Name'}</h3>
+          <p className={`text-[15px] ${colors.text} font-bold tracking-wide`}>{personal.role || 'Professional Role'}</p>
         </div>
-        <div className="flex flex-col text-left sm:text-right text-[10px] text-slate-550 space-y-0.5 font-medium shrink-0">
+        <div className="flex flex-col text-left sm:text-right text-[10px] text-slate-600 space-y-0.5 font-semibold shrink-0">
           {personal.email && <span>{personal.email}</span>}
           {personal.phone && <span>{personal.phone}</span>}
           {personal.location && <span>{personal.location}</span>}
@@ -323,24 +323,24 @@ export function ResumePreview({
   const renderCreativeTemplate = () => (
     <div className="flex flex-col md:flex-row h-full">
       {/* Side Column with custom border */}
-      <div className={`w-full md:w-[30%] p-5 space-y-5 bg-slate-50 border-r border-slate-200 relative`}>
+      <div className={`w-full md:w-[25%] p-5 space-y-6 bg-slate-50 border-r border-slate-200 relative`}>
         {/* Color accent bar */}
         <div className={`absolute top-0 left-0 bottom-0 w-1 ${colors.bg} bg-opacity-100 ${colors.borderSolid} border-l-4`}></div>
         
         <div className="space-y-3 text-left pl-1">
-          <h4 className={`text-[10px] font-bold ${colors.text} uppercase tracking-widest font-semibold`}>Details</h4>
-          <div className="space-y-3 text-[10px] text-slate-700 font-medium">
-            {personal.email && <div><p className="text-slate-400 text-[8px] uppercase tracking-wider font-semibold">Email</p><span className="break-all">{personal.email}</span></div>}
-            {personal.phone && <div><p className="text-slate-400 text-[8px] uppercase tracking-wider font-semibold">Phone</p><span>{personal.phone}</span></div>}
-            {personal.location && <div><p className="text-slate-400 text-[8px] uppercase tracking-wider font-semibold">Address</p><span>{personal.location}</span></div>}
-            {personal.linkedin && <div><p className="text-slate-400 text-[8px] uppercase tracking-wider font-semibold">LinkedIn</p><span className="break-all">{personal.linkedin.replace(/^https?:\/\/(www\.)?/, '')}</span></div>}
-            {personal.github && <div><p className="text-slate-400 text-[8px] uppercase tracking-wider font-semibold">GitHub</p><span className="break-all">{personal.github.replace(/^https?:\/\/(www\.)?/, '')}</span></div>}
+          <h4 className={`text-[12.5px] font-bold ${colors.text} uppercase tracking-widest`}>Details</h4>
+          <div className="space-y-3 text-[10px] text-slate-800 font-semibold">
+            {personal.email && <div><p className="text-slate-600 text-[8px] uppercase tracking-wider font-semibold">Email</p><span className="break-all">{personal.email}</span></div>}
+            {personal.phone && <div><p className="text-slate-600 text-[8px] uppercase tracking-wider font-semibold">Phone</p><span>{personal.phone}</span></div>}
+            {personal.location && <div><p className="text-slate-600 text-[8px] uppercase tracking-wider font-semibold">Address</p><span>{personal.location}</span></div>}
+            {personal.linkedin && <div><p className="text-slate-600 text-[8px] uppercase tracking-wider font-semibold">LinkedIn</p><span className="break-all">{personal.linkedin.replace(/^https?:\/\/(www\.)?/, '')}</span></div>}
+            {personal.github && <div><p className="text-slate-600 text-[8px] uppercase tracking-wider font-semibold">GitHub</p><span className="break-all">{personal.github.replace(/^https?:\/\/(www\.)?/, '')}</span></div>}
           </div>
         </div>
 
         {/* Skills pill list */}
         <div className="space-y-3 text-left pl-1">
-          <h4 className={`text-[10px] font-bold ${colors.text} uppercase tracking-widest font-semibold`}>Skills</h4>
+          <h4 className={`text-[12.5px] font-bold ${colors.text} uppercase tracking-widest`}>Skills</h4>
           <div className="flex flex-wrap gap-1">
             {skills.map((s, idx) => (
               <span key={idx} className={`text-[9px] font-semibold px-2 py-0.5 rounded-full ${colors.bg} ${colors.text} border ${colors.border}`}>
@@ -354,8 +354,8 @@ export function ResumePreview({
       {/* Main Body */}
       <div className={`flex-grow ${density.padding} ${density.spacing}`}>
         <div className="text-left border-b border-slate-200 pb-3">
-          <h3 className="text-2xl font-black tracking-tight text-slate-900 uppercase">{personal.fullName || 'Your Name'}</h3>
-          <p className={`text-xs ${colors.textLight} font-bold tracking-widest uppercase mt-0.5`}>{personal.role || 'Professional Role'}</p>
+          <h3 className="text-[30px] leading-tight font-black tracking-tight text-slate-900 uppercase">{personal.fullName || 'Your Name'}</h3>
+          <p className={`text-[15px] ${colors.text} font-bold tracking-widest uppercase mt-0.5`}>{personal.role || 'Professional Role'}</p>
         </div>
         {sectionOrder.filter(id => id !== 'skills').map(id => renderSection(id))}
       </div>
@@ -364,13 +364,13 @@ export function ResumePreview({
 
   // Executive Template (Heavy corporate layouts, formal italics)
   const renderExecutiveTemplate = () => (
-    <div className={`p-6 md:p-8 space-y-5 font-serif text-slate-700 border-t-4 ${colors.borderSolid}`}>
+    <div className={`${density.padding} ${density.spacing} font-serif text-slate-800 border-t-4 ${colors.borderSolid}`}>
       <div className="text-left flex flex-col sm:flex-row justify-between items-start sm:items-end border-b border-slate-200 pb-4 gap-3">
         <div className="space-y-1">
-          <h3 className="text-2xl font-bold tracking-wide text-slate-900">{personal.fullName || 'Your Name'}</h3>
-          <p className={`text-xs font-semibold uppercase tracking-wider ${colors.text}`}>{personal.role || 'Professional Role'}</p>
+          <h3 className="text-[30px] leading-tight font-bold tracking-wide text-slate-900">{personal.fullName || 'Your Name'}</h3>
+          <p className={`text-[15px] font-semibold uppercase tracking-wider ${colors.text}`}>{personal.role || 'Professional Role'}</p>
         </div>
-        <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-[10px] text-slate-500 font-sans text-left sm:text-right font-medium shrink-0">
+        <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-[10px] text-slate-600 font-sans text-left sm:text-right font-semibold shrink-0">
           {personal.email && <span>Email: {personal.email}</span>}
           {personal.phone && <span>Tel: {personal.phone}</span>}
           {personal.location && <span>Loc: {personal.location}</span>}
@@ -384,14 +384,14 @@ export function ResumePreview({
 
   // Compact Template (High density grids, optimized margins)
   const renderCompactTemplate = () => (
-    <div className={`p-4 md:p-5 ${density.spacing} font-sans`}>
+    <div className={`${density.padding} ${density.spacing} font-sans`}>
       {/* Header Compact */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-baseline border-b border-slate-200 pb-2.5 gap-1.5">
         <div className="text-left">
-          <h3 className="text-lg font-bold tracking-tight text-slate-900 inline-block mr-3">{personal.fullName || 'Your Name'}</h3>
-          <span className={`text-[10px] ${colors.textLight} font-bold uppercase tracking-wider`}>{personal.role || 'Professional Role'}</span>
+          <h3 className="text-[30px] leading-tight font-bold tracking-tight text-slate-900 inline-block mr-3">{personal.fullName || 'Your Name'}</h3>
+          <span className={`text-[15px] ${colors.text} font-bold uppercase tracking-wider`}>{personal.role || 'Professional Role'}</span>
         </div>
-        <div className="flex flex-wrap gap-2 text-[9px] text-slate-500 font-semibold">
+        <div className="flex flex-wrap gap-2 text-[10px] text-slate-600 font-semibold">
           {personal.email && <span>{personal.email}</span>}
           {personal.phone && <span>• {personal.phone}</span>}
           {personal.location && <span>• {personal.location}</span>}
