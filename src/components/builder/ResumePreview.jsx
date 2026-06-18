@@ -106,9 +106,12 @@ export function ResumePreview({
   // Section Renders
   const renderSummary = () => (
     <div key="summary" className={density.sectionSpacing}>
-      <h4 className={`text-[12.5px] font-bold text-slate-800 uppercase tracking-wider border-b border-slate-300 pb-0.5`}>
-        Professional Summary
-      </h4>
+      <div>
+        <h4 className={`text-[12.5px] font-bold text-slate-800 uppercase tracking-wider`}>
+          Professional Summary
+        </h4>
+        <div className="border-b border-slate-300 mt-1"></div>
+      </div>
       <p className="text-[11px] text-slate-800 leading-relaxed font-medium">{summary}</p>
     </div>
   );
@@ -117,9 +120,12 @@ export function ResumePreview({
     if (!hasSkills) return null;
     return (
       <div key="skills" className={density.sectionSpacing}>
-        <h4 className={`text-[12.5px] font-bold text-slate-800 uppercase tracking-wider border-b border-slate-300 pb-0.5`}>
-          Skills
-        </h4>
+        <div>
+          <h4 className={`text-[12.5px] font-bold text-slate-800 uppercase tracking-wider`}>
+            Skills
+          </h4>
+          <div className="border-b border-slate-300 mt-1"></div>
+        </div>
         {asList ? (
           <p className="text-[11px] text-slate-800 leading-relaxed font-medium">
             {skills.join(', ')}
@@ -139,9 +145,12 @@ export function ResumePreview({
 
   const renderExperience = (showBullets = true) => (
     <div key="experience" className={density.sectionSpacing}>
-      <h4 className={`text-[12.5px] font-bold text-slate-800 uppercase tracking-wider border-b border-slate-300 pb-0.5`}>
-        Experience
-      </h4>
+      <div>
+        <h4 className={`text-[12.5px] font-bold text-slate-800 uppercase tracking-wider`}>
+          Experience
+        </h4>
+        <div className="border-b border-slate-300 mt-1"></div>
+      </div>
       <div className={density.itemSpacing}>
         {experience.map((exp, idx) => (
           <div key={idx} className="text-[11px]">
@@ -163,9 +172,12 @@ export function ResumePreview({
 
   const renderProjects = () => (
     <div key="projects" className={density.sectionSpacing}>
-      <h4 className={`text-[12.5px] font-bold text-slate-800 uppercase tracking-wider border-b border-slate-300 pb-0.5`}>
-        Projects
-      </h4>
+      <div>
+        <h4 className={`text-[12.5px] font-bold text-slate-800 uppercase tracking-wider`}>
+          Projects
+        </h4>
+        <div className="border-b border-slate-300 mt-1"></div>
+      </div>
       <div className={density.itemSpacing}>
         {projects.map((proj, idx) => (
           <div key={idx} className="text-[11px]">
@@ -193,9 +205,12 @@ export function ResumePreview({
 
   const renderEducation = () => (
     <div key="education" className={density.sectionSpacing}>
-      <h4 className={`text-[12.5px] font-bold text-slate-800 uppercase tracking-wider border-b border-slate-300 pb-0.5`}>
-        Education
-      </h4>
+      <div>
+        <h4 className={`text-[12.5px] font-bold text-slate-800 uppercase tracking-wider`}>
+          Education
+        </h4>
+        <div className="border-b border-slate-300 mt-1"></div>
+      </div>
       <div className="space-y-2">
         {education.map((edu, idx) => (
           <div key={idx} className="flex justify-between items-baseline text-[11px]">
