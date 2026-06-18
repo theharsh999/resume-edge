@@ -113,22 +113,22 @@ export function Templates() {
                 <div
                   key={template.id}
                   onClick={() => handleSelectTemplate(template.id)}
-                  className={`flex flex-col group rounded-3xl bg-surface/30 border cursor-pointer relative overflow-hidden h-[600px] transition-all duration-300 ease-in-out hover:-translate-y-1.5 hover:scale-[1.01] ${
+                  className={`flex flex-col group rounded-3xl bg-surface/30 border cursor-pointer relative overflow-hidden transition-all duration-300 ease-in-out hover:-translate-y-1.5 hover:scale-[1.01] ${
                     isActive
                       ? 'border-primary bg-primary/5 shadow-premium shadow-primary/10 ring-1 ring-primary/20'
                       : 'border-slate-800 hover:border-slate-700/80 hover:shadow-2xl hover:shadow-primary/5'
                   }`}
                 >
-                  {/* Template Preview Section (73% of Card Height, centered A4 sheet) */}
-                  <div className="h-[440px] w-full bg-slate-950/45 border-b border-slate-850 flex items-center justify-center p-4 overflow-hidden relative transition-all duration-300 group-hover:opacity-95">
+                  {/* Template Preview Section — height driven by scaled sheet */}
+                  <div className="w-full bg-slate-950/45 border-b border-slate-800 flex items-start justify-center px-3 pt-3 pb-2 overflow-hidden relative transition-all duration-300 group-hover:opacity-95">
                     {/* Centered A4 Page Mockup */}
-                    <div className="w-[270px] h-[380px] bg-white rounded-lg shadow-2xl overflow-hidden relative border border-slate-200 shrink-0">
+                    <div className="w-[300px] h-[420px] bg-white rounded-lg shadow-2xl overflow-hidden relative border border-slate-200 shrink-0">
                       {/* Scaled ResumePreview inside the sheet */}
                       <div style={{
-                        transform: 'scale(0.32)',
+                        transform: 'scale(0.38)',
                         transformOrigin: 'top left',
-                        width: '312.5%', // 1 / 0.32
-                        height: '312.5%',
+                        width: '263.16%', // 1 / 0.38
+                        height: '263.16%',
                         pointerEvents: 'none',
                         position: 'absolute',
                         top: 0,
@@ -151,8 +151,8 @@ export function Templates() {
                     )}
                   </div>
 
-                  {/* Card Details (27% of Card Height) */}
-                  <div className="p-6 flex-grow flex flex-col justify-between space-y-4">
+                  {/* Card Details */}
+                  <div className="p-6 flex flex-col justify-between space-y-4">
                     <div className="text-left space-y-1">
                       <div className="flex justify-between items-center gap-2">
                         <h3 className="text-lg font-bold text-text group-hover:text-primary-light transition-colors duration-200">
