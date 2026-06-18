@@ -120,15 +120,15 @@ export function Templates() {
                   }`}
                 >
                   {/* Template Preview Section — height driven by scaled sheet */}
-                  <div className="w-full bg-slate-950/45 border-b border-slate-800 flex items-start justify-center px-3 pt-3 pb-2 overflow-hidden relative transition-all duration-300 group-hover:opacity-95">
+                  <div className="w-full bg-slate-950/45 border-b border-slate-800 flex items-center justify-center px-2 pt-2 pb-1 overflow-hidden relative transition-all duration-300 group-hover:opacity-95">
                     {/* Centered A4 Page Mockup */}
-                    <div className="w-[300px] h-[420px] bg-white rounded-lg shadow-2xl overflow-hidden relative border border-slate-200 shrink-0">
+                    <div className="w-[320px] h-[440px] bg-white rounded-lg shadow-2xl overflow-hidden relative border border-slate-200 shrink-0">
                       {/* Scaled ResumePreview inside the sheet */}
                       <div style={{
-                        transform: 'scale(0.38)',
+                        transform: 'scale(0.45)',
                         transformOrigin: 'top left',
-                        width: '263.16%', // 1 / 0.38
-                        height: '263.16%',
+                        width: '222.22%', // 1 / 0.45
+                        height: '222.22%',
                         pointerEvents: 'none',
                         position: 'absolute',
                         top: 0,
