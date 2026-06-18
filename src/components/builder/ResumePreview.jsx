@@ -2,6 +2,19 @@ import { useMemo } from 'react';
 import { Badge } from '../ui/Badge';
 import { Mail, Phone, MapPin, Linkedin, Github, FileText } from 'lucide-react';
 
+function SectionHeader({ title }) {
+  return (
+    <div className="flex flex-col w-full">
+      <h4 className="text-[12.5px] font-bold text-slate-800 uppercase tracking-wider leading-none">
+        {title}
+      </h4>
+      <div className="flex items-center h-3 w-full">
+        <div className="w-full border-b border-slate-300"></div>
+      </div>
+    </div>
+  );
+}
+
 export function ResumePreview({ 
   data, 
   template = 'modern',
@@ -106,12 +119,7 @@ export function ResumePreview({
   // Section Renders
   const renderSummary = () => (
     <div key="summary" className={density.sectionSpacing}>
-      <div>
-        <h4 className={`text-[12.5px] font-bold text-slate-800 uppercase tracking-wider`}>
-          Professional Summary
-        </h4>
-        <div className="border-b border-slate-300 mt-1"></div>
-      </div>
+      <SectionHeader title="Professional Summary" />
       <p className="text-[11px] text-slate-800 leading-relaxed font-medium">{summary}</p>
     </div>
   );
@@ -120,12 +128,7 @@ export function ResumePreview({
     if (!hasSkills) return null;
     return (
       <div key="skills" className={density.sectionSpacing}>
-        <div>
-          <h4 className={`text-[12.5px] font-bold text-slate-800 uppercase tracking-wider`}>
-            Skills
-          </h4>
-          <div className="border-b border-slate-300 mt-1"></div>
-        </div>
+        <SectionHeader title="Skills" />
         {asList ? (
           <p className="text-[11px] text-slate-800 leading-relaxed font-medium">
             {skills.join(', ')}
@@ -145,12 +148,7 @@ export function ResumePreview({
 
   const renderExperience = (showBullets = true) => (
     <div key="experience" className={density.sectionSpacing}>
-      <div>
-        <h4 className={`text-[12.5px] font-bold text-slate-800 uppercase tracking-wider`}>
-          Experience
-        </h4>
-        <div className="border-b border-slate-300 mt-1"></div>
-      </div>
+      <SectionHeader title="Experience" />
       <div className={density.itemSpacing}>
         {experience.map((exp, idx) => (
           <div key={idx} className="text-[11px]">
@@ -172,12 +170,7 @@ export function ResumePreview({
 
   const renderProjects = () => (
     <div key="projects" className={density.sectionSpacing}>
-      <div>
-        <h4 className={`text-[12.5px] font-bold text-slate-800 uppercase tracking-wider`}>
-          Projects
-        </h4>
-        <div className="border-b border-slate-300 mt-1"></div>
-      </div>
+      <SectionHeader title="Projects" />
       <div className={density.itemSpacing}>
         {projects.map((proj, idx) => (
           <div key={idx} className="text-[11px]">
@@ -205,12 +198,7 @@ export function ResumePreview({
 
   const renderEducation = () => (
     <div key="education" className={density.sectionSpacing}>
-      <div>
-        <h4 className={`text-[12.5px] font-bold text-slate-800 uppercase tracking-wider`}>
-          Education
-        </h4>
-        <div className="border-b border-slate-300 mt-1"></div>
-      </div>
+      <SectionHeader title="Education" />
       <div className="space-y-2">
         {education.map((edu, idx) => (
           <div key={idx} className="flex justify-between items-baseline text-[11px]">
