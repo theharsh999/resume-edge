@@ -71,7 +71,7 @@ function replaceColorsInString(str) {
   });
 }
 
-export function ExportPDFButton({ elementId, filename = 'resume.pdf', onSuccess, onError, className = 'w-full h-11' }) {
+export function ExportPDFButton({ elementId, filename = 'resume.pdf', onSuccess, onError, disabled, className = 'w-full h-11' }) {
   const [isExporting, setIsExporting] = useState(false);
 
   const handleExport = async () => {
@@ -88,7 +88,7 @@ export function ExportPDFButton({ elementId, filename = 'resume.pdf', onSuccess,
     const isEmpty = element.querySelector('[data-empty-preview="true"]');
     if (isEmpty) {
       console.warn('[PDF Export] Verification failed: Resume is empty.');
-      if (onError) onError('Your resume is empty. Please enter your details before exporting.');
+      if (onError) onError('Load or create a resume first');
       return;
     }
 
@@ -267,12 +267,20 @@ export function ExportPDFButton({ elementId, filename = 'resume.pdf', onSuccess,
     }
   };
 
+  const handleClick = (e) => {
+    if (disabled) {
+      if (onError) onError('Load or create a resume first');
+      return;
+    }
+    handleExport();
+  };
+
   return (
     <Button
-      onClick={handleExport}
+      onClick={handleClick}
       disabled={isExporting}
       variant="primary"
-      className={`${className} shadow-premium-glow text-xs font-semibold gap-2 transition-all duration-300`}
+      className={`${className} shadow-premium-glow text-xs font-semibold gap-2 transition-all duration-300 ${disabled ? 'opacity-50 bg-slate-700 hover:bg-slate-700 border-slate-700 shadow-none cursor-not-allowed text-slate-400' : ''}`}
     >
       {isExporting ? (
         <>

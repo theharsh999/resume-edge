@@ -5,6 +5,7 @@ import { Badge } from '../components/ui/Badge';
 import { ResumeForm } from '../components/builder/ResumeForm';
 import { ResumePreview } from '../components/builder/ResumePreview';
 import { Toast } from '../components/ui/Toast';
+import { extractTextFromPdf, extractTextFromDocx, parseResumeText } from '../utils/parser';
 
 // Analytics dashboard widgets
 import { ATSScoreCard } from '../components/builder/ATSScoreCard';
@@ -155,29 +156,63 @@ export function Builder() {
     }
   });
 
-  const handleImportFile = (file) => {
+  const handleImportFile = async (file) => {
     const ext = file.name.split('.').pop().toLowerCase();
     if (ext !== 'pdf' && ext !== 'docx') {
       addToast('Invalid file format. Please upload a PDF or DOCX file.', 'warning');
       return;
     }
 
-    const fileRef = {
-      name: file.name,
-      size: file.size,
-      uploadedAt: new Date().toISOString(),
-    };
+    try {
+      addToast('Reading file...', 'info');
+      await new Promise(r => setTimeout(r, 400));
+      
+      addToast('Extracting content...', 'info');
+      await new Promise(r => setTimeout(r, 400));
 
-    localStorage.setItem(LOCAL_STORAGE_KEY_IMPORTED_FILE, JSON.stringify(fileRef));
-    setImportedFile(fileRef);
-    addToast('Resume imported successfully. Parsing support coming soon.', 'success');
+      let text = '';
+      if (ext === 'pdf') {
+        text = await extractTextFromPdf(file);
+      } else {
+        text = await extractTextFromDocx(file);
+      }
+
+      if (!text || text.trim().length === 0) {
+        throw new Error('The file contains no readable text.');
+      }
+
+      addToast('Building resume...', 'info');
+      await new Promise(r => setTimeout(r, 400));
+
+      const parsedData = parseResumeText(text);
+
+      const fileRef = {
+        name: file.name,
+        size: file.size,
+        uploadedAt: new Date().toISOString(),
+      };
+
+      localStorage.setItem(LOCAL_STORAGE_KEY_IMPORTED_FILE, JSON.stringify(fileRef));
+      setImportedFile(fileRef);
+      
+      setResumeData(parsedData);
+      setShowOnboarding(false);
+      addToast('Import complete!', 'success');
+    } catch (error) {
+      console.error('Import failed:', error);
+      addToast(`Import failed: ${error.message || 'Corrupted or unreadable file.'}`, 'warning');
+    }
   };
 
   const handleRemoveImport = (e) => {
     e.stopPropagation();
-    localStorage.removeItem(LOCAL_STORAGE_KEY_IMPORTED_FILE);
-    setImportedFile(null);
-    addToast('Imported file unlinked.', 'info');
+    if (window.confirm('Are you sure you want to remove the imported resume? This will clear the workspace.')) {
+      localStorage.removeItem(LOCAL_STORAGE_KEY_IMPORTED_FILE);
+      setImportedFile(null);
+      setResumeData(defaultState);
+      setShowOnboarding(true);
+      addToast('Imported resume removed.', 'info');
+    }
   };
 
   const isEmptyData = 
@@ -270,6 +305,9 @@ export function Builder() {
       setTemplate('modern');
       setSettings(defaultSettings);
       setSectionOrder(defaultOrder);
+      localStorage.removeItem(LOCAL_STORAGE_KEY_IMPORTED_FILE);
+      setImportedFile(null);
+      setShowOnboarding(true);
       addToast('Workspace data cleared!', 'info');
     }
   };
@@ -437,17 +475,20 @@ export function Builder() {
               filename={exportFilename} 
               onSuccess={() => addToast('PDF exported successfully!', 'success')}
               onError={(msg) => addToast(msg, 'warning')}
+              disabled={isEmptyData}
               className="h-9 px-4 text-xs font-semibold shrink-0"
             />
 
             {/* Clear Workspace button */}
-            <button
-              onClick={handleClearAll}
-              type="button"
-              className="flex items-center justify-center gap-1.5 text-xs font-semibold text-red-400 hover:text-red-300 transition-colors border border-red-500/10 hover:border-red-500/20 bg-red-950/10 px-3 py-1.5 rounded-lg shrink-0 cursor-pointer h-9"
-            >
-              <Trash2 className="h-3.5 w-3.5" /> Clear Workspace
-            </button>
+            {!isEmptyData && (
+              <button
+                onClick={handleClearAll}
+                type="button"
+                className="flex items-center justify-center gap-1.5 text-xs font-semibold text-red-400 hover:text-red-300 transition-colors border border-red-500/10 hover:border-red-500/20 bg-red-950/10 px-3 py-1.5 rounded-lg shrink-0 cursor-pointer h-9"
+              >
+                <Trash2 className="h-3.5 w-3.5" /> Clear Workspace
+              </button>
+            )}
           </div>
         </div>
 
@@ -496,66 +537,83 @@ export function Builder() {
                     <FileUp className="h-3.5 w-3.5 text-secondary-light" />
                     Import Existing Resume
                   </button>
-
-                  <input
-                    type="file"
-                    ref={fileInputRef}
-                    onChange={(e) => {
-                      if (e.target.files && e.target.files.length > 0) {
-                        handleImportFile(e.target.files[0]);
-                      }
-                    }}
-                    accept=".pdf,.docx"
-                    className="hidden"
-                  />
                 </div>
-
-                {/* Import File Status Card */}
-                {importedFile && (
-                  <div className="p-4 border border-slate-800 bg-slate-950/40 rounded-xl relative z-10 flex flex-col gap-3 animate-fade-in">
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="flex items-center gap-2 min-w-0">
-                        <FileText className="h-4 w-4 text-primary shrink-0" />
-                        <span className="font-bold text-text text-xs truncate block max-w-[170px]" title={importedFile.name}>
-                          {importedFile.name}
-                        </span>
+              </div>
+            ) : (
+              <div className="space-y-6 animate-fade-in">
+                {/* Imported Resume Card or Mini Upload option */}
+                {importedFile ? (
+                  <div className="bg-slate-900/60 border border-slate-800 rounded-xl p-4 flex flex-col gap-3 relative overflow-hidden shadow-lg">
+                    <div className="absolute top-0 right-0 h-16 w-16 bg-primary/10 rounded-bl-full pointer-events-none blur-xl"></div>
+                    
+                    <div className="flex items-start justify-between gap-3 relative z-10">
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <div className="p-2 bg-primary/10 rounded-lg text-primary shrink-0 border border-primary/20">
+                          <FileText className="h-4 w-4" />
+                        </div>
+                        <div className="min-w-0 text-left">
+                          <div className="text-xs font-bold text-text truncate max-w-[180px] md:max-w-[220px]" title={importedFile.name}>
+                            {importedFile.name}
+                          </div>
+                          <div className="text-[10px] text-muted font-semibold mt-0.5">
+                            Size: {formatBytes(importedFile.size)}
+                          </div>
+                        </div>
                       </div>
+                      
+                      {/* Remove Resume Button */}
                       <button
                         onClick={handleRemoveImport}
                         type="button"
-                        className="text-red-400 hover:text-red-300 p-0.5 transition-colors cursor-pointer shrink-0"
-                        title="Remove imported reference"
+                        className="text-red-400 hover:text-red-300 p-1.5 hover:bg-red-500/10 rounded-lg transition-colors cursor-pointer shrink-0 border border-transparent hover:border-red-500/20"
+                        title="Remove imported resume"
                       >
                         <Trash2 className="h-3.5 w-3.5" />
                       </button>
                     </div>
 
-                    <div className="flex flex-col gap-1 text-[10px] text-muted font-semibold">
-                      <div>Size: {formatBytes(importedFile.size)}</div>
-                      <div>Imported: {new Date(importedFile.uploadedAt).toLocaleDateString()}</div>
+                    <div className="flex items-center justify-between gap-4 pt-2 border-t border-slate-800/60 relative z-10">
+                      <div className="text-[10px] text-muted font-medium">
+                        Imported: <span className="font-semibold text-slate-300">{new Date(importedFile.uploadedAt).toLocaleString()}</span>
+                      </div>
+                      
+                      {/* Re-import Button */}
+                      <button
+                        onClick={() => fileInputRef.current?.click()}
+                        type="button"
+                        className="flex items-center gap-1 text-[10px] font-bold text-primary-light hover:text-primary hover:bg-primary/5 px-2.5 py-1 rounded-md border border-primary/10 hover:border-primary/20 transition-all cursor-pointer"
+                      >
+                        Re-import
+                      </button>
                     </div>
-
-                    <Badge
-                      variant="success"
-                      className="text-[8px] py-0.5 px-2 bg-success/10 border-success/20 text-success flex items-center gap-1 font-bold tracking-wider uppercase w-fit"
+                  </div>
+                ) : (
+                  <div className="bg-slate-900/40 border border-slate-800/80 rounded-xl p-3.5 flex items-center justify-between gap-4 shadow-sm">
+                    <div className="flex items-center gap-2">
+                      <FileUp className="h-4 w-4 text-primary" />
+                      <span className="text-xs font-semibold text-muted">Have an existing resume?</span>
+                    </div>
+                    <button
+                      onClick={() => fileInputRef.current?.click()}
+                      type="button"
+                      className="text-xs font-bold text-primary-light hover:text-primary bg-primary/5 hover:bg-primary/10 border border-primary/20 hover:border-primary/30 px-3 py-1.5 rounded-lg transition-all active:scale-[0.98] cursor-pointer"
                     >
-                      <span className="h-1 w-1 rounded-full bg-success animate-pulse" />
-                      Imported Reference
-                    </Badge>
+                      Import File
+                    </button>
                   </div>
                 )}
+
+                <ResumeForm 
+                  data={resumeData} 
+                  onDataChange={setResumeData} 
+                  template={template}
+                  onTemplateChange={handleTemplateChange}
+                  settings={settings}
+                  onSettingsChange={handleSettingsChange}
+                  sectionOrder={sectionOrder}
+                  onReorderSections={handleReorderSections}
+                />
               </div>
-            ) : (
-              <ResumeForm 
-                data={resumeData} 
-                onDataChange={setResumeData} 
-                template={template}
-                onTemplateChange={handleTemplateChange}
-                settings={settings}
-                onSettingsChange={handleSettingsChange}
-                sectionOrder={sectionOrder}
-                onReorderSections={handleReorderSections}
-              />
             )}
           </div>
 
@@ -590,6 +648,17 @@ export function Builder() {
             <ResumeInsights insights={insights} />
           </div>
         </div>
+        <input
+          type="file"
+          ref={fileInputRef}
+          onChange={(e) => {
+            if (e.target.files && e.target.files.length > 0) {
+              handleImportFile(e.target.files[0]);
+            }
+          }}
+          accept=".pdf,.docx"
+          className="hidden"
+        />
       </Container>
 
       {/* Floating Toast Notification alerts overlay */}
