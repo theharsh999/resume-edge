@@ -14,7 +14,11 @@ import { CompletionTracker } from '../components/builder/CompletionTracker';
 import { RecruiterChecklist } from '../components/builder/RecruiterChecklist';
 import { ExportPDFButton } from '../components/builder/ExportPDFButton';
 
-import { Trash2, ArrowLeft, Sparkles, FileUp, FileText, Check } from 'lucide-react';
+import { Trash2, ArrowLeft, Sparkles, FileUp, FileText, Check, Loader2 } from 'lucide-react';
+import * as pdfjsLib from 'pdfjs-dist';
+import pdfWorker from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
+
+pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorker;
 import { Link } from 'react-router-dom';
 
 const LOCAL_STORAGE_KEY_DATA = 'resumeedge_data';
@@ -52,6 +56,136 @@ const dataURLtoBlob = (dataurl) => {
   }
   return new Blob([u8arr], { type: mime });
 };
+
+function PdfCanvasViewer({ fileUrl }) {
+  const [pages, setPages] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    if (!fileUrl) return;
+
+    let isMounted = true;
+    setLoading(true);
+    setPages([]);
+
+    const renderPdf = async () => {
+      try {
+        const loadingTask = pdfjsLib.getDocument({ url: fileUrl });
+        const pdf = await loadingTask.promise;
+        
+        if (!isMounted) return;
+
+        const renderedPages = [];
+        for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+          renderedPages.push(pageNum);
+        }
+        setPages(renderedPages);
+        setLoading(false);
+      } catch (err) {
+        console.error('Error loading PDF for canvas rendering:', err);
+        if (isMounted) setLoading(false);
+      }
+    };
+
+    renderPdf();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [fileUrl]);
+
+  return (
+    <div className="w-full flex flex-col gap-6 items-center py-6 bg-slate-950/20 rounded-xl overflow-y-auto max-h-[80vh] border border-slate-800/60" ref={containerRef}>
+      {loading && (
+        <div className="text-xs font-semibold text-muted py-16 flex items-center gap-2">
+          <Loader2 className="h-4 w-4 animate-spin text-primary" />
+          Loading document pages...
+        </div>
+      )}
+      {!loading && pages.map((pageNum) => (
+        <PdfPageCanvas key={pageNum} fileUrl={fileUrl} pageNum={pageNum} />
+      ))}
+    </div>
+  );
+}
+
+function PdfPageCanvas({ fileUrl, pageNum }) {
+  const canvasRef = useRef(null);
+  const [renderStatus, setRenderStatus] = useState('idle'); // 'idle' | 'rendering' | 'success' | 'error'
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const renderPage = async () => {
+      try {
+        setRenderStatus('rendering');
+        const loadingTask = pdfjsLib.getDocument({ url: fileUrl });
+        const pdf = await loadingTask.promise;
+        const page = await pdf.getPage(pageNum);
+        
+        if (!isMounted || !canvasRef.current) return;
+
+        const canvas = canvasRef.current;
+        const context = canvas.getContext('2d');
+        
+        const viewport = page.getViewport({ scale: 1.5 });
+        canvas.height = viewport.height;
+        canvas.width = viewport.width;
+
+        const renderContext = {
+          canvasContext: context,
+          viewport: viewport
+        };
+        await page.render(renderContext).promise;
+        if (isMounted) setRenderStatus('success');
+      } catch (err) {
+        console.error(`Error rendering PDF page ${pageNum}:`, err);
+        if (isMounted) setRenderStatus('error');
+      }
+    };
+
+    renderPage();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [fileUrl, pageNum]);
+
+  return (
+    <div className="bg-white p-3 rounded-xl shadow-premium border border-slate-200 w-[95%] max-w-[700px] shrink-0 flex flex-col items-center justify-center relative min-h-[300px]">
+      {renderStatus === 'rendering' && (
+        <div className="absolute inset-0 flex items-center justify-center bg-slate-100/50 rounded-lg">
+          <Loader2 className="h-5 w-5 animate-spin text-slate-400" />
+        </div>
+      )}
+      <canvas ref={canvasRef} className="w-full h-auto rounded-md block bg-white" />
+    </div>
+  );
+}
+
+function DocxHtmlViewer({ htmlContent }) {
+  return (
+    <div className="w-full flex flex-col gap-6 items-center py-6 bg-slate-950/20 rounded-xl overflow-y-auto max-h-[80vh] border border-slate-800/60">
+      <div className="bg-white p-10 rounded-xl shadow-premium border border-slate-200 w-[95%] max-w-[700px] shrink-0 text-slate-800 text-left docx-preview-container animate-fade-in min-h-[80vh]">
+        <style>{`
+          .docx-preview-container h1, .docx-preview-container h2, .docx-preview-container h3 {
+            font-weight: 700;
+            color: #0f172a;
+            margin-top: 1.5rem;
+            margin-bottom: 0.5rem;
+          }
+          .docx-preview-container h1 { font-size: 1.75rem; border-b: 1px solid #e2e8f0; padding-bottom: 0.25rem; }
+          .docx-preview-container h2 { font-size: 1.25rem; }
+          .docx-preview-container p { margin-bottom: 0.75rem; line-height: 1.6; }
+          .docx-preview-container ul, .docx-preview-container ol { margin-left: 1.5rem; margin-bottom: 1rem; list-style-type: disc; }
+          .docx-preview-container li { margin-bottom: 0.25rem; }
+        `}</style>
+        <div dangerouslySetInnerHTML={{ __html: htmlContent }} />
+      </div>
+    </div>
+  );
+}
 
 const defaultState = {
   personal: {
@@ -182,14 +316,23 @@ export function Builder() {
   const [docxHtml, setDocxHtml] = useState(() => {
     return localStorage.getItem('resumeedge_imported_file_docx_html') || '';
   });
-  const [previewTab, setPreviewTab] = useState(() => {
+
+  const [appMode, setAppMode] = useState(() => {
     try {
+      const savedMode = localStorage.getItem('resumeedge_app_mode');
       const savedFile = localStorage.getItem(LOCAL_STORAGE_KEY_IMPORTED_FILE);
-      return savedFile ? 'original' : 'template';
+      if (savedFile) {
+        return savedMode || 'import';
+      }
+      return 'builder';
     } catch {
-      return 'template';
+      return 'builder';
     }
   });
+
+  useEffect(() => {
+    localStorage.setItem('resumeedge_app_mode', appMode);
+  }, [appMode]);
 
   useEffect(() => {
     const base64 = localStorage.getItem('resumeedge_imported_file_data');
@@ -242,6 +385,9 @@ export function Builder() {
         throw new Error('The file contains no readable text.');
       }
 
+      // Save raw text to localStorage for later parsing in Edit Mode
+      localStorage.setItem('resumeedge_imported_file_text', text);
+
       let htmlContent = '';
       if (ext === 'docx') {
         try {
@@ -252,11 +398,6 @@ export function Builder() {
           console.error('Failed to convert docx to html:', docxErr);
         }
       }
-
-      addToast('Building resume...', 'info');
-      await new Promise(r => setTimeout(r, 400));
-
-      const parsedData = parseResumeText(text);
 
       const base64Data = await fileToBase64(file);
       localStorage.setItem('resumeedge_imported_file_data', base64Data);
@@ -270,46 +411,57 @@ export function Builder() {
 
       localStorage.setItem(LOCAL_STORAGE_KEY_IMPORTED_FILE, JSON.stringify(fileRef));
       setImportedFile(fileRef);
-      setPreviewTab('original');
-      
-      setResumeData(parsedData);
+      setAppMode('import');
       setShowOnboarding(false);
-
-      const hasAnyExtracted = 
-        parsedData.personal.fullName ||
-        parsedData.personal.role ||
-        parsedData.personal.email ||
-        parsedData.personal.phone ||
-        parsedData.personal.location ||
-        parsedData.personal.linkedin ||
-        parsedData.personal.github ||
-        parsedData.summary ||
-        (parsedData.skills && parsedData.skills.length > 0) ||
-        (parsedData.experience && parsedData.experience.length > 0) ||
-        (parsedData.education && parsedData.education.length > 0) ||
-        (parsedData.projects && parsedData.projects.length > 0);
-
-      if (hasAnyExtracted) {
-        addToast('Resume imported. Some fields may require manual review.', 'success');
-      } else {
-        addToast('Resume uploaded successfully. Structured data could not be extracted.', 'warning');
-      }
+      addToast('Resume uploaded successfully.', 'success');
     } catch (error) {
       console.error('Import failed:', error);
       addToast(`Import failed: ${error.message || 'Corrupted or unreadable file.'}`, 'warning');
     }
   };
 
+  const handleEnterEditMode = () => {
+    const text = localStorage.getItem('resumeedge_imported_file_text') || '';
+    
+    // Parse raw text into fields confidently without default templates
+    const parsedData = parseResumeText(text);
+
+    setResumeData(parsedData);
+    setAppMode('edit');
+    localStorage.setItem('resumeedge_app_mode', 'edit');
+
+    const hasAnyExtracted = 
+      parsedData.personal.fullName ||
+      parsedData.personal.role ||
+      parsedData.personal.email ||
+      parsedData.personal.phone ||
+      parsedData.personal.location ||
+      parsedData.personal.linkedin ||
+      parsedData.personal.github ||
+      parsedData.summary ||
+      (parsedData.skills && parsedData.skills.length > 0) ||
+      (parsedData.experience && parsedData.experience.length > 0) ||
+      (parsedData.education && parsedData.education.length > 0) ||
+      (parsedData.projects && parsedData.projects.length > 0);
+
+    if (hasAnyExtracted) {
+      addToast('Resume imported. Some fields may require manual review.', 'success');
+    } else {
+      addToast('Resume uploaded successfully. Structured data could not be extracted.', 'warning');
+    }
+  };
+
   const handleRemoveImport = (e) => {
-    e.stopPropagation();
+    if (e) e.stopPropagation();
     if (window.confirm('Are you sure you want to remove the imported resume? This will clear the workspace.')) {
       localStorage.removeItem(LOCAL_STORAGE_KEY_IMPORTED_FILE);
       localStorage.removeItem('resumeedge_imported_file_data');
       localStorage.removeItem('resumeedge_imported_file_type');
       localStorage.removeItem('resumeedge_imported_file_docx_html');
+      localStorage.removeItem('resumeedge_imported_file_text');
       setImportedFile(null);
       setDocxHtml('');
-      setPreviewTab('template');
+      setAppMode('builder');
       setResumeData(defaultState);
       setShowOnboarding(true);
       addToast('Imported resume removed.', 'info');
@@ -397,6 +549,8 @@ export function Builder() {
 
   const handleLoadDemo = () => {
     setResumeData(demoResumeData);
+    setAppMode('builder');
+    setShowOnboarding(false);
     addToast('Demo developer resume loaded!', 'info');
   };
 
@@ -410,12 +564,68 @@ export function Builder() {
       localStorage.removeItem('resumeedge_imported_file_data');
       localStorage.removeItem('resumeedge_imported_file_type');
       localStorage.removeItem('resumeedge_imported_file_docx_html');
+      localStorage.removeItem('resumeedge_imported_file_text');
       setImportedFile(null);
       setDocxHtml('');
-      setPreviewTab('template');
+      setAppMode('builder');
       setShowOnboarding(true);
       addToast('Workspace data cleared!', 'info');
     }
+  };
+
+  const renderImportedCard = (showEditButton) => {
+    if (!importedFile) return null;
+    return (
+      <div className="bg-slate-900/60 border border-slate-800 rounded-xl p-5 flex flex-col gap-4 relative overflow-hidden shadow-lg mb-6 text-left">
+        <div className="absolute top-0 right-0 h-16 w-16 bg-primary/10 rounded-bl-full pointer-events-none blur-xl"></div>
+        
+        <div>
+          <Badge variant="primary" className="mb-2">Imported Resume</Badge>
+          <div className="flex items-center gap-2.5 min-w-0">
+            <FileText className="h-5 w-5 text-primary shrink-0" />
+            <div className="min-w-0">
+              <div className="text-sm font-bold text-text truncate max-w-[220px]" title={importedFile.name}>
+                {importedFile.name}
+              </div>
+              <div className="text-xs text-muted font-medium mt-1">
+                Size: {formatBytes(importedFile.size)}
+              </div>
+              <div className="text-xs text-muted font-medium mt-0.5">
+                Imported On: {new Date(importedFile.uploadedAt).toLocaleDateString()}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex flex-wrap gap-2 pt-2 border-t border-slate-800/60">
+          {showEditButton && (
+            <button
+              onClick={handleEnterEditMode}
+              type="button"
+              className="flex-grow min-w-[100px] flex items-center justify-center gap-1.5 text-xs font-bold bg-primary hover:bg-primary-dark text-text border border-primary-light/20 px-3 py-2 rounded-lg transition-all active:scale-[0.98] cursor-pointer"
+            >
+              <Check className="h-3.5 w-3.5" />
+              Edit Resume
+            </button>
+          )}
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            type="button"
+            className="flex-grow min-w-[100px] flex items-center justify-center gap-1.5 text-xs font-semibold bg-slate-800 hover:bg-slate-750 text-text border border-slate-700 px-3 py-2 rounded-lg transition-all active:scale-[0.98] cursor-pointer"
+          >
+            Replace Resume
+          </button>
+          <button
+            onClick={handleRemoveImport}
+            type="button"
+            className="flex-grow min-w-[100px] flex items-center justify-center gap-1.5 text-xs font-semibold text-red-400 hover:text-red-350 bg-red-950/20 hover:bg-red-950/30 border border-red-500/10 px-3 py-2 rounded-lg transition-all active:scale-[0.98] cursor-pointer"
+          >
+            <Trash2 className="h-3.5 w-3.5" />
+            Remove Resume
+          </button>
+        </div>
+      </div>
+    );
   };
 
   // Programmatic calculations for builder analytics
@@ -586,7 +796,7 @@ export function Builder() {
             />
 
             {/* Clear Workspace button */}
-            {!isEmptyData && (
+            {(!isEmptyData || importedFile) && (
               <button
                 onClick={handleClearAll}
                 type="button"
@@ -600,7 +810,6 @@ export function Builder() {
 
         {/* 2-Column Split Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          {/* Column 1: Form (col-span-4) */}
           <div className="lg:col-span-4 space-y-6">
             {isEmptyData && showOnboarding ? (
               <div className="bg-surface border border-slate-800 rounded-2xl p-6 space-y-5 text-left shadow-2xl relative overflow-hidden animate-fade-in">
@@ -619,7 +828,10 @@ export function Builder() {
                 {/* Compact Action Buttons */}
                 <div className="flex flex-col gap-2 relative z-10">
                   <button
-                    onClick={() => setShowOnboarding(false)}
+                    onClick={() => {
+                      setShowOnboarding(false);
+                      setAppMode('builder');
+                    }}
                     type="button"
                     className="w-full flex items-center justify-center gap-2 text-xs font-bold bg-slate-950/40 hover:bg-slate-900 border border-slate-800 hover:border-slate-700 px-4 py-2.5 rounded-xl transition-all text-text active:scale-[0.98] cursor-pointer"
                   >
@@ -647,148 +859,83 @@ export function Builder() {
               </div>
             ) : (
               <div className="space-y-6 animate-fade-in">
-                {/* Imported Resume Card or Mini Upload option */}
-                {importedFile ? (
-                  <div className="bg-slate-900/60 border border-slate-800 rounded-xl p-4 flex flex-col gap-3 relative overflow-hidden shadow-lg">
-                    <div className="absolute top-0 right-0 h-16 w-16 bg-primary/10 rounded-bl-full pointer-events-none blur-xl"></div>
-                    
-                    <div className="flex items-start justify-between gap-3 relative z-10">
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        <div className="p-2 bg-primary/10 rounded-lg text-primary shrink-0 border border-primary/20">
-                          <FileText className="h-4 w-4" />
-                        </div>
-                        <div className="min-w-0 text-left">
-                          <div className="text-xs font-bold text-text truncate max-w-[180px] md:max-w-[220px]" title={importedFile.name}>
-                            {importedFile.name}
-                          </div>
-                          <div className="text-[10px] text-muted font-semibold mt-0.5">
-                            Size: {formatBytes(importedFile.size)}
-                          </div>
-                        </div>
-                      </div>
-                      
-                      {/* Remove Resume Button */}
-                      <button
-                        onClick={handleRemoveImport}
-                        type="button"
-                        className="text-red-400 hover:text-red-300 p-1.5 hover:bg-red-500/10 rounded-lg transition-colors cursor-pointer shrink-0 border border-transparent hover:border-red-500/20"
-                        title="Remove imported resume"
-                      >
-                        <Trash2 className="h-3.5 w-3.5" />
-                      </button>
-                    </div>
-
-                    <div className="flex items-center justify-between gap-4 pt-2 border-t border-slate-800/60 relative z-10">
-                      <div className="text-[10px] text-muted font-medium">
-                        Imported: <span className="font-semibold text-slate-300">{new Date(importedFile.uploadedAt).toLocaleString()}</span>
-                      </div>
-                      
-                      {/* Re-import Button */}
-                      <button
-                        onClick={() => fileInputRef.current?.click()}
-                        type="button"
-                        className="flex items-center gap-1 text-[10px] font-bold text-primary-light hover:text-primary hover:bg-primary/5 px-2.5 py-1 rounded-md border border-primary/10 hover:border-primary/20 transition-all cursor-pointer"
-                      >
-                        Re-import
-                      </button>
-                    </div>
-                  </div>
+                {appMode === 'import' && importedFile ? (
+                  renderImportedCard(true)
                 ) : (
-                  <div className="bg-slate-900/40 border border-slate-800/80 rounded-xl p-3.5 flex items-center justify-between gap-4 shadow-sm">
-                    <div className="flex items-center gap-2">
-                      <FileUp className="h-4 w-4 text-primary" />
-                      <span className="text-xs font-semibold text-muted">Have an existing resume?</span>
-                    </div>
-                    <button
-                      onClick={() => fileInputRef.current?.click()}
-                      type="button"
-                      className="text-xs font-bold text-primary-light hover:text-primary bg-primary/5 hover:bg-primary/10 border border-primary/20 hover:border-primary/30 px-3 py-1.5 rounded-lg transition-all active:scale-[0.98] cursor-pointer"
-                    >
-                      Import File
-                    </button>
-                  </div>
+                  <>
+                    {importedFile && renderImportedCard(false)}
+                    {!importedFile && (
+                      <div className="bg-slate-900/40 border border-slate-800/80 rounded-xl p-3.5 flex items-center justify-between gap-4 shadow-sm">
+                        <div className="flex items-center gap-2">
+                          <FileUp className="h-4 w-4 text-primary" />
+                          <span className="text-xs font-semibold text-muted">Have an existing resume?</span>
+                        </div>
+                        <button
+                          onClick={() => fileInputRef.current?.click()}
+                          type="button"
+                          className="text-xs font-bold text-primary-light hover:text-primary bg-primary/5 hover:bg-primary/10 border border-primary/20 hover:border-primary/30 px-3 py-1.5 rounded-lg transition-all active:scale-[0.98] cursor-pointer"
+                        >
+                          Import File
+                        </button>
+                      </div>
+                    )}
+                    <ResumeForm 
+                      data={resumeData} 
+                      onDataChange={setResumeData} 
+                      template={template}
+                      onTemplateChange={handleTemplateChange}
+                      settings={settings}
+                      onSettingsChange={handleSettingsChange}
+                      sectionOrder={sectionOrder}
+                      onReorderSections={handleReorderSections}
+                    />
+                  </>
                 )}
-
-                <ResumeForm 
-                  data={resumeData} 
-                  onDataChange={setResumeData} 
-                  template={template}
-                  onTemplateChange={handleTemplateChange}
-                  settings={settings}
-                  onSettingsChange={handleSettingsChange}
-                  sectionOrder={sectionOrder}
-                  onReorderSections={handleReorderSections}
-                />
               </div>
             )}
           </div>
 
           {/* Column 2: Live Sticky Preview (col-span-8) */}
           <div className="lg:col-span-8 lg:sticky lg:top-24 lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto lg:pr-1 preview-scroll-container flex flex-col">
-            {importedFile && (
-              <div className="flex justify-start items-center gap-2 mb-4 bg-slate-900/50 p-1 rounded-lg border border-slate-800/80 w-fit shrink-0">
-                <button
-                  onClick={() => setPreviewTab('original')}
-                  type="button"
-                  className={`text-xs font-semibold px-3 py-1.5 rounded-md transition-all cursor-pointer ${
-                    previewTab === 'original'
-                      ? 'bg-primary text-text shadow-sm'
-                      : 'text-muted hover:text-text'
-                  }`}
-                >
-                  Original Resume
-                </button>
-                <button
-                  onClick={() => setPreviewTab('template')}
-                  type="button"
-                  className={`text-xs font-semibold px-3 py-1.5 rounded-md transition-all cursor-pointer ${
-                    previewTab === 'template'
-                      ? 'bg-primary text-text shadow-sm'
-                      : 'text-muted hover:text-text'
-                  }`}
-                >
-                  Template Preview
-                </button>
-              </div>
-            )}
+            {appMode === 'import' && importedFile ? (
+              <div className="w-full flex flex-col flex-grow">
+                {/* Top Section */}
+                <div className="flex justify-between items-center gap-4 mb-4 bg-slate-900/60 p-4 rounded-xl border border-slate-800/80 shrink-0 text-left">
+                  <div className="flex items-center gap-2.5">
+                    <span className="text-xl">📄</span>
+                    <div>
+                      <h4 className="text-xs font-bold text-text">Uploaded Resume</h4>
+                      <p className="text-[10px] text-muted font-medium mt-0.5">Viewing original uploaded document</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={handleEnterEditMode}
+                    type="button"
+                    className="text-xs font-bold bg-primary hover:bg-primary-dark text-text border border-primary-light/20 px-4 py-2 rounded-lg transition-all active:scale-[0.98] cursor-pointer"
+                  >
+                    Edit Resume
+                  </button>
+                </div>
 
-            {previewTab === 'original' && importedFile ? (
-              <div className="w-full flex-grow">
-                {importedFileType?.includes('pdf') || importedFile?.name.toLowerCase().endsWith('.pdf') ? (
-                  <iframe
-                    src={importedFileUrl}
-                    title="Original PDF Preview"
-                    className="w-full h-[80vh] border border-slate-800 rounded-xl bg-white shadow-2xl animate-fade-in"
-                  />
-                ) : docxHtml ? (
-                  <div className="w-full h-[80vh] border border-slate-800 rounded-xl bg-white text-slate-900 p-8 shadow-2xl overflow-y-auto text-left docx-preview-container animate-fade-in">
-                    <style>{`
-                      .docx-preview-container h1, .docx-preview-container h2, .docx-preview-container h3 {
-                        font-weight: 700;
-                        color: #0f172a;
-                        margin-top: 1.5rem;
-                        margin-bottom: 0.5rem;
-                      }
-                      .docx-preview-container h1 { font-size: 1.75rem; border-b: 1px solid #e2e8f0; padding-bottom: 0.25rem; }
-                      .docx-preview-container h2 { font-size: 1.25rem; }
-                      .docx-preview-container p { margin-bottom: 0.75rem; line-height: 1.6; }
-                      .docx-preview-container ul, .docx-preview-container ol { margin-left: 1.5rem; margin-bottom: 1rem; list-style-type: disc; }
-                      .docx-preview-container li { margin-bottom: 0.25rem; }
-                    `}</style>
-                    <div dangerouslySetInnerHTML={{ __html: docxHtml }} />
-                  </div>
-                ) : (
-                  <div className="w-full h-[80vh] border border-slate-800 rounded-xl bg-slate-900/40 flex flex-col items-center justify-center p-8 text-center text-muted animate-fade-in">
-                    <FileText className="h-12 w-12 text-muted mb-4" />
-                    <p className="font-bold text-text mb-1">Document Viewer</p>
-                    <p className="text-xs max-w-xs leading-relaxed">The uploaded document preview is ready. Switch to the Template Preview tab to see styling options.</p>
-                  </div>
-                )}
+                {/* PDF/DOCX Viewer */}
+                <div className="w-full flex-grow">
+                  {importedFileType?.includes('pdf') || importedFile?.name.toLowerCase().endsWith('.pdf') ? (
+                    <PdfCanvasViewer fileUrl={importedFileUrl} />
+                  ) : docxHtml ? (
+                    <DocxHtmlViewer htmlContent={docxHtml} />
+                  ) : (
+                    <div className="w-full h-[80vh] border border-slate-800 rounded-xl bg-slate-900/40 flex flex-col items-center justify-center p-8 text-center text-muted animate-fade-in">
+                      <FileText className="h-12 w-12 text-muted mb-4" />
+                      <p className="font-bold text-text mb-1">Document Viewer</p>
+                      <p className="text-xs max-w-xs leading-relaxed">The uploaded document preview is ready. Click "Edit Resume" to begin editing.</p>
+                    </div>
+                  )}
+                </div>
               </div>
             ) : null}
 
-            {/* Template preview is rendered offscreen when original tab is active, so PDF export can always capture it */}
-            <div className={previewTab === 'original' && importedFile ? 'absolute left-[-9999px] top-0 w-full' : 'w-full'}>
+            {/* Template preview is rendered offscreen when in import mode, so PDF export can always capture it */}
+            <div className={appMode === 'import' && importedFile ? 'absolute left-[-9999px] top-0 w-full' : 'w-full'}>
               <ResumePreview data={resumeData} template={template} settings={settings} sectionOrder={sectionOrder} />
             </div>
           </div>
