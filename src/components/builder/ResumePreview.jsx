@@ -26,11 +26,13 @@ const SPACING_MAP = {
 function SectionHeader({ title, density = 'balanced' }) {
   const spacing = SPACING_MAP[density] || SPACING_MAP.balanced;
   return (
-    <div className="flex flex-col w-full" style={{ marginBottom: spacing.dividerToContent }}>
-      <h4 className="text-[12.5px] font-bold text-slate-800 uppercase tracking-wider leading-none" style={{ marginBottom: spacing.headingToDivider }}>
+    <div className="flex flex-col w-full">
+      <h4 className="text-[12.5px] font-bold text-slate-800 uppercase tracking-wider leading-normal">
         {title}
       </h4>
+      <div style={{ height: spacing.headingToDivider, minHeight: spacing.headingToDivider, width: '100%' }}></div>
       <div className="w-full border-b border-slate-300" style={{ borderBottomWidth: '1px' }}></div>
+      <div style={{ height: spacing.dividerToContent, minHeight: spacing.dividerToContent, width: '100%' }}></div>
     </div>
   );
 }
@@ -171,22 +173,21 @@ export function ResumePreview({
       <SectionHeader title="Experience" density={settings.density} />
       <div className="flex flex-col">
         {experience.map((exp, idx) => (
-          <div 
-            key={idx} 
-            className="text-[11px] flex flex-col"
-            style={{ 
-              marginBottom: idx === experience.length - 1 ? '0px' : (SPACING_MAP[settings.density || 'balanced']?.itemSpacing || '16px') 
-            }}
-          >
-            <div className="flex justify-between items-baseline font-bold">
-              <span className="text-[11px] text-slate-900 font-bold">{exp.company}</span>
-              <span className="text-[10px] text-slate-600 font-semibold">{exp.startDate} – {exp.endDate}</span>
+          <div key={idx} className="flex flex-col">
+            <div className="text-[11px] flex flex-col">
+              <div className="flex justify-between items-baseline font-bold">
+                <span className="text-[11px] text-slate-900 font-bold">{exp.company}</span>
+                <span className="text-[10px] text-slate-600 font-semibold">{exp.startDate} – {exp.endDate}</span>
+              </div>
+              <div className={`text-[11px] ${colors.text} font-bold`}>{exp.role}</div>
+              {exp.description && (
+                <p className="text-[11px] text-slate-800 mt-1 leading-relaxed whitespace-pre-line font-medium">
+                  {exp.description}
+                </p>
+              )}
             </div>
-            <div className={`text-[11px] ${colors.text} font-bold`}>{exp.role}</div>
-            {exp.description && (
-              <p className="text-[11px] text-slate-800 mt-1 leading-relaxed whitespace-pre-line font-medium">
-                {exp.description}
-              </p>
+            {idx < experience.length - 1 && (
+              <div style={{ height: SPACING_MAP[settings.density || 'balanced']?.itemSpacing || '16px', minHeight: SPACING_MAP[settings.density || 'balanced']?.itemSpacing || '16px', width: '100%' }}></div>
             )}
           </div>
         ))}
@@ -199,28 +200,27 @@ export function ResumePreview({
       <SectionHeader title="Projects" density={settings.density} />
       <div className="flex flex-col">
         {projects.map((proj, idx) => (
-          <div 
-            key={idx} 
-            className="text-[11px] flex flex-col"
-            style={{ 
-              marginBottom: idx === projects.length - 1 ? '0px' : (SPACING_MAP[settings.density || 'balanced']?.itemSpacing || '16px') 
-            }}
-          >
-            <div className="flex justify-between items-baseline font-bold">
-              <span className="text-[11px] text-slate-900 font-bold">{proj.projectName}</span>
-              {proj.githubLink && (
-                <span className={`text-[10px] ${colors.text} hover:underline font-semibold`}>
-                  {proj.githubLink.replace(/^https?:\/\/(www\.)?github\.com\//, '')}
-                </span>
+          <div key={idx} className="flex flex-col">
+            <div className="text-[11px] flex flex-col">
+              <div className="flex justify-between items-baseline font-bold">
+                <span className="text-[11px] text-slate-900 font-bold">{proj.projectName}</span>
+                {proj.githubLink && (
+                  <span className={`text-[10px] ${colors.text} hover:underline font-semibold`}>
+                    {proj.githubLink.replace(/^https?:\/\/(www\.)?github\.com\//, '')}
+                  </span>
+                )}
+              </div>
+              {proj.techStack && (
+                <div className="text-[10px] text-slate-600 font-bold mt-0.5">Tech Stack: {proj.techStack}</div>
+              )}
+              {proj.description && (
+                <p className="text-[11px] text-slate-800 mt-1 leading-relaxed font-medium">
+                  {proj.description}
+                </p>
               )}
             </div>
-            {proj.techStack && (
-              <div className="text-[10px] text-slate-600 font-bold mt-0.5">Tech Stack: {proj.techStack}</div>
-            )}
-            {proj.description && (
-              <p className="text-[11px] text-slate-800 mt-1 leading-relaxed font-medium">
-                {proj.description}
-              </p>
+            {idx < projects.length - 1 && (
+              <div style={{ height: SPACING_MAP[settings.density || 'balanced']?.itemSpacing || '16px', minHeight: SPACING_MAP[settings.density || 'balanced']?.itemSpacing || '16px', width: '100%' }}></div>
             )}
           </div>
         ))}
@@ -233,23 +233,23 @@ export function ResumePreview({
       <SectionHeader title="Education" density={settings.density} />
       <div className="flex flex-col">
         {education.map((edu, idx) => (
-          <div 
-            key={idx} 
-            className="flex justify-between items-baseline text-[11px]"
-            style={{ 
-              marginBottom: idx === education.length - 1 ? '0px' : '8px' 
-            }}
-          >
-            <div>
-              <span className="text-[11px] font-bold text-slate-900">{edu.degree}</span>
-              <span className="text-slate-600 block text-[10px] font-bold">{edu.college}</span>
+          <div key={idx} className="flex flex-col">
+            <div className="flex justify-between items-baseline text-[11px]">
+              <div>
+                <span className="text-[11px] font-bold text-slate-900">{edu.degree}</span>
+                <span className="text-slate-600 block text-[10px] font-bold">{edu.college}</span>
+              </div>
+              <span className="text-[10px] text-slate-600 shrink-0 font-semibold">{edu.startYear} – {edu.endYear}</span>
             </div>
-            <span className="text-[10px] text-slate-600 shrink-0 font-semibold">{edu.startYear} – {edu.endYear}</span>
+            {idx < education.length - 1 && (
+              <div style={{ height: '8px', minHeight: '8px', width: '100%' }}></div>
+            )}
           </div>
         ))}
       </div>
     </div>
   );
+
 
   const renderSection = (sectionId, asList = true) => {
     switch(sectionId) {
@@ -294,10 +294,11 @@ export function ResumePreview({
 
       {/* Right Column Body */}
       <div className={`flex flex-col flex-grow ${density.padding}`}>
-        <div className="flex flex-col text-left border-b border-slate-200 pb-3" style={{ marginBottom: SPACING_MAP[settings.density || 'balanced']?.sectionBottom }}>
+        <div className="flex flex-col text-left border-b border-slate-200 pb-3">
           <h3 className="text-[30px] leading-tight font-extrabold tracking-tight text-slate-900">{personal.fullName || 'Your Name'}</h3>
           <p className={`text-[15px] ${colors.text} font-bold tracking-wide uppercase`} style={{ marginTop: '4px' }}>{personal.role || 'Professional Role'}</p>
         </div>
+        <div style={{ height: SPACING_MAP[settings.density || 'balanced']?.sectionBottom, minHeight: SPACING_MAP[settings.density || 'balanced']?.sectionBottom, width: '100%' }}></div>
         {/* Render sections in custom order (excluding skills which is in sidebar) */}
         {(() => {
           const activeSections = sectionOrder
@@ -305,13 +306,11 @@ export function ResumePreview({
             .map(id => ({ id, element: renderSection(id) }))
             .filter(item => item.element !== null);
           return activeSections.map((item, idx) => (
-            <div 
-              key={item.id} 
-              style={{ 
-                marginBottom: idx === activeSections.length - 1 ? '0px' : (SPACING_MAP[settings.density || 'balanced']?.sectionBottom || '24px') 
-              }}
-            >
+            <div key={item.id} className="flex flex-col">
               {item.element}
+              {idx < activeSections.length - 1 && (
+                <div style={{ height: SPACING_MAP[settings.density || 'balanced']?.sectionBottom, minHeight: SPACING_MAP[settings.density || 'balanced']?.sectionBottom, width: '100%' }}></div>
+              )}
             </div>
           ));
         })()}
@@ -322,7 +321,7 @@ export function ResumePreview({
   // Professional Template (Serif elegant centered style)
   const renderProfessionalTemplate = () => (
     <div className={`flex flex-col font-serif ${density.padding}`}>
-      <div className="flex flex-col text-center border-b border-slate-200 pb-3" style={{ marginBottom: SPACING_MAP[settings.density || 'balanced']?.sectionBottom }}>
+      <div className="flex flex-col text-center border-b border-slate-200 pb-3">
         <h3 className="text-[30px] leading-tight font-semibold tracking-wide text-slate-900">{personal.fullName || 'Your Name'}</h3>
         <p className={`text-[15px] italic ${colors.text} font-semibold tracking-wide`} style={{ marginTop: '6px' }}>{personal.role || 'Professional Role'}</p>
         <div className="flex flex-wrap justify-center gap-x-3 gap-y-1 text-[10px] text-slate-600 font-semibold font-sans" style={{ marginTop: '6px' }}>
@@ -353,18 +352,17 @@ export function ResumePreview({
           )}
         </div>
       </div>
+      <div style={{ height: SPACING_MAP[settings.density || 'balanced']?.sectionBottom, minHeight: SPACING_MAP[settings.density || 'balanced']?.sectionBottom, width: '100%' }}></div>
       {(() => {
         const activeSections = sectionOrder
           .map(id => ({ id, element: renderSection(id, true) }))
           .filter(item => item.element !== null);
         return activeSections.map((item, idx) => (
-          <div 
-            key={item.id} 
-            style={{ 
-              marginBottom: idx === activeSections.length - 1 ? '0px' : (SPACING_MAP[settings.density || 'balanced']?.sectionBottom || '24px') 
-            }}
-          >
+          <div key={item.id} className="flex flex-col">
             {item.element}
+            {idx < activeSections.length - 1 && (
+              <div style={{ height: SPACING_MAP[settings.density || 'balanced']?.sectionBottom, minHeight: SPACING_MAP[settings.density || 'balanced']?.sectionBottom, width: '100%' }}></div>
+            )}
           </div>
         ));
       })()}
@@ -374,29 +372,28 @@ export function ResumePreview({
   // Minimal Template (Clean compact columns)
   const renderMinimalTemplate = () => (
     <div className={`flex flex-col ${density.padding}`}>
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-200 pb-4 gap-2" style={{ marginBottom: SPACING_MAP[settings.density || 'balanced']?.sectionBottom }}>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-200 pb-4 gap-2">
         <div className="flex flex-col text-left">
           <h3 className="text-[30px] leading-tight font-bold tracking-tight text-slate-900">{personal.fullName || 'Your Name'}</h3>
           <p className={`text-[15px] ${colors.text} font-bold tracking-wide`} style={{ marginTop: '2px' }}>{personal.role || 'Professional Role'}</p>
         </div>
         <div className="flex flex-col text-left sm:text-right text-[10px] text-slate-600 font-semibold shrink-0">
           {[personal.email, personal.phone, personal.location].filter(Boolean).map((text, idx, arr) => (
-            <span key={idx} style={{ marginBottom: idx === arr.length - 1 ? '0px' : '2px' }}>{text}</span>
+            <span key={idx} style={{ paddingBottom: idx === arr.length - 1 ? '0px' : '2px' }}>{text}</span>
           ))}
         </div>
       </div>
+      <div style={{ height: SPACING_MAP[settings.density || 'balanced']?.sectionBottom, minHeight: SPACING_MAP[settings.density || 'balanced']?.sectionBottom, width: '100%' }}></div>
       {(() => {
         const activeSections = sectionOrder
           .map(id => ({ id, element: renderSection(id, false) }))
           .filter(item => item.element !== null);
         return activeSections.map((item, idx) => (
-          <div 
-            key={item.id} 
-            style={{ 
-              marginBottom: idx === activeSections.length - 1 ? '0px' : (SPACING_MAP[settings.density || 'balanced']?.sectionBottom || '24px') 
-            }}
-          >
+          <div key={item.id} className="flex flex-col">
             {item.element}
+            {idx < activeSections.length - 1 && (
+              <div style={{ height: SPACING_MAP[settings.density || 'balanced']?.sectionBottom, minHeight: SPACING_MAP[settings.density || 'balanced']?.sectionBottom, width: '100%' }}></div>
+            )}
           </div>
         ));
       })()}
@@ -437,23 +434,22 @@ export function ResumePreview({
 
       {/* Main Body */}
       <div className={`flex flex-col flex-grow ${density.padding}`}>
-        <div className="text-left border-b border-slate-200 pb-3" style={{ marginBottom: SPACING_MAP[settings.density || 'balanced']?.sectionBottom }}>
+        <div className="text-left border-b border-slate-200 pb-3">
           <h3 className="text-[30px] leading-tight font-black tracking-tight text-slate-900 uppercase">{personal.fullName || 'Your Name'}</h3>
           <p className={`text-[15px] ${colors.text} font-bold tracking-widest uppercase mt-0.5`} style={{ marginTop: '2px' }}>{personal.role || 'Professional Role'}</p>
         </div>
+        <div style={{ height: SPACING_MAP[settings.density || 'balanced']?.sectionBottom, minHeight: SPACING_MAP[settings.density || 'balanced']?.sectionBottom, width: '100%' }}></div>
         {(() => {
           const activeSections = sectionOrder
             .filter(id => id !== 'skills')
             .map(id => ({ id, element: renderSection(id) }))
             .filter(item => item.element !== null);
           return activeSections.map((item, idx) => (
-            <div 
-              key={item.id} 
-              style={{ 
-                marginBottom: idx === activeSections.length - 1 ? '0px' : (SPACING_MAP[settings.density || 'balanced']?.sectionBottom || '24px') 
-              }}
-            >
+            <div key={item.id} className="flex flex-col">
               {item.element}
+              {idx < activeSections.length - 1 && (
+                <div style={{ height: SPACING_MAP[settings.density || 'balanced']?.sectionBottom, minHeight: SPACING_MAP[settings.density || 'balanced']?.sectionBottom, width: '100%' }}></div>
+              )}
             </div>
           ));
         })()}
@@ -464,7 +460,7 @@ export function ResumePreview({
   // Executive Template (Heavy corporate layouts, formal italics)
   const renderExecutiveTemplate = () => (
     <div className={`flex flex-col ${density.padding} font-serif text-slate-800 border-t-4 ${colors.borderSolid}`}>
-      <div className="text-left flex flex-col sm:flex-row justify-between items-start sm:items-end border-b border-slate-200 pb-4 gap-3" style={{ marginBottom: SPACING_MAP[settings.density || 'balanced']?.sectionBottom }}>
+      <div className="text-left flex flex-col sm:flex-row justify-between items-start sm:items-end border-b border-slate-200 pb-4 gap-3">
         <div className="flex flex-col">
           <h3 className="text-[30px] leading-tight font-bold tracking-wide text-slate-900">{personal.fullName || 'Your Name'}</h3>
           <p className={`text-[15px] font-semibold uppercase tracking-wider ${colors.text}`} style={{ marginTop: '4px' }}>{personal.role || 'Professional Role'}</p>
@@ -476,19 +472,18 @@ export function ResumePreview({
           {personal.linkedin && <span>LinkedIn: {personal.linkedin.replace(/^https?:\/\/(www\.)?/, '')}</span>}
         </div>
       </div>
+      <div style={{ height: SPACING_MAP[settings.density || 'balanced']?.sectionBottom, minHeight: SPACING_MAP[settings.density || 'balanced']?.sectionBottom, width: '100%' }}></div>
 
       {(() => {
         const activeSections = sectionOrder
           .map(id => ({ id, element: renderSection(id, true) }))
           .filter(item => item.element !== null);
         return activeSections.map((item, idx) => (
-          <div 
-            key={item.id} 
-            style={{ 
-              marginBottom: idx === activeSections.length - 1 ? '0px' : (SPACING_MAP[settings.density || 'balanced']?.sectionBottom || '24px') 
-            }}
-          >
+          <div key={item.id} className="flex flex-col">
             {item.element}
+            {idx < activeSections.length - 1 && (
+              <div style={{ height: SPACING_MAP[settings.density || 'balanced']?.sectionBottom, minHeight: SPACING_MAP[settings.density || 'balanced']?.sectionBottom, width: '100%' }}></div>
+            )}
           </div>
         ));
       })()}
@@ -499,7 +494,7 @@ export function ResumePreview({
   const renderCompactTemplate = () => (
     <div className={`flex flex-col ${density.padding} font-sans`}>
       {/* Header Compact */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-baseline border-b border-slate-200 pb-2.5 gap-1.5" style={{ marginBottom: SPACING_MAP[settings.density || 'balanced']?.sectionBottom }}>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-baseline border-b border-slate-200 pb-2.5 gap-1.5">
         <div className="text-left">
           <h3 className="text-[30px] leading-tight font-bold tracking-tight text-slate-900 inline-block mr-3">{personal.fullName || 'Your Name'}</h3>
           <span className={`text-[15px] ${colors.text} font-bold uppercase tracking-wider`}>{personal.role || 'Professional Role'}</span>
@@ -510,19 +505,18 @@ export function ResumePreview({
           {personal.location && <span>• {personal.location}</span>}
         </div>
       </div>
+      <div style={{ height: SPACING_MAP[settings.density || 'balanced']?.sectionBottom, minHeight: SPACING_MAP[settings.density || 'balanced']?.sectionBottom, width: '100%' }}></div>
 
       {(() => {
         const activeSections = sectionOrder
           .map(id => ({ id, element: renderSection(id, true) }))
           .filter(item => item.element !== null);
         return activeSections.map((item, idx) => (
-          <div 
-            key={item.id} 
-            style={{ 
-              marginBottom: idx === activeSections.length - 1 ? '0px' : (SPACING_MAP[settings.density || 'balanced']?.sectionBottom || '24px') 
-            }}
-          >
+          <div key={item.id} className="flex flex-col">
             {item.element}
+            {idx < activeSections.length - 1 && (
+              <div style={{ height: SPACING_MAP[settings.density || 'balanced']?.sectionBottom, minHeight: SPACING_MAP[settings.density || 'balanced']?.sectionBottom, width: '100%' }}></div>
+            )}
           </div>
         ));
       })()}
