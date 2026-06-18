@@ -25,6 +25,12 @@ export async function extractTextFromDocx(file) {
   return result.value;
 }
 
+export async function convertDocxToHtml(file) {
+  const arrayBuffer = await file.arrayBuffer();
+  const result = await mammoth.convertToHtml({ arrayBuffer });
+  return result.value;
+}
+
 const SECTION_HEADERS = {
   summary: [/summary/i, /professional summary/i, /objective/i, /profile/i],
   skills: [/skills/i, /technical skills/i, /key skills/i, /core competencies/i, /expertise/i, /languages/i],
@@ -126,21 +132,21 @@ export function parseResumeText(text) {
     const isDegree = /bachelor|master|degree|b\.s\.|b\.a\.|m\.s\.|ph\.d|diploma|associate/i.test(line);
 
     if (isCollege || isDegree || hasYear) {
-      const startYear = yearMatch && yearMatch[0] ? yearMatch[0] : '2015';
-      const endYear = yearMatch && yearMatch[1] ? yearMatch[1] : '2019';
+      const startYear = yearMatch && yearMatch[0] ? yearMatch[0] : '';
+      const endYear = yearMatch && yearMatch[1] ? yearMatch[1] : '';
 
       if (isCollege && !isDegree) {
         if (currentEdu) education.push(currentEdu);
         currentEdu = {
           college: line,
-          degree: 'B.S. in Computer Science',
+          degree: '',
           startYear,
           endYear
         };
       } else if (isDegree) {
         if (!currentEdu) {
           currentEdu = {
-            college: 'University',
+            college: '',
             degree: line,
             startYear,
             endYear
@@ -154,10 +160,10 @@ export function parseResumeText(text) {
   if (currentEdu) education.push(currentEdu);
   if (education.length === 0 && sections.education.length > 0) {
     education.push({
-      college: sections.education[0] || 'University Name',
-      degree: sections.education[1] || 'Degree/Major',
-      startYear: '2015',
-      endYear: '2019'
+      college: sections.education[0] || '',
+      degree: sections.education[1] || '',
+      startYear: '',
+      endYear: ''
     });
   }
 
@@ -172,16 +178,16 @@ export function parseResumeText(text) {
       if (currentExp) experience.push(currentExp);
       const companyText = line.replace(/\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec|January|February|March|April|May|June|July|August|September|October|November|December)?\s*(19\d{2}|20\d{2})\b/gi, '').trim();
       currentExp = {
-        company: companyText || 'Company Name',
-        role: 'Software Engineer',
-        startDate: dateMatch[0] || 'Mar 2022',
-        endDate: dateMatch[1] || 'Present',
+        company: companyText || '',
+        role: '',
+        startDate: dateMatch[0] || '',
+        endDate: dateMatch[1] || '',
         description: ''
       };
     } else if (currentExp) {
       if (line.startsWith('•') || line.startsWith('-') || line.startsWith('*')) {
         currentExp.description += (currentExp.description ? '\n' : '') + line;
-      } else if (line.length < 50 && (currentExp.role === 'Software Engineer' || !currentExp.role)) {
+      } else if (line.length < 50 && !currentExp.role) {
         currentExp.role = line;
       } else {
         currentExp.description += (currentExp.description ? '\n' : '') + '• ' + line;
@@ -191,10 +197,10 @@ export function parseResumeText(text) {
   if (currentExp) experience.push(currentExp);
   if (experience.length === 0 && sections.experience.length > 0) {
     experience.push({
-      company: sections.experience[0] || 'Company Name',
-      role: sections.experience[1] || 'Job Role',
-      startDate: '2022',
-      endDate: 'Present',
+      company: sections.experience[0] || '',
+      role: sections.experience[1] || '',
+      startDate: '',
+      endDate: '',
       description: sections.experience.slice(2).join('\n')
     });
   }
@@ -211,8 +217,8 @@ export function parseResumeText(text) {
       const ghLink = ghMatch ? 'https://' + ghMatch[1] : '';
       const nameText = line.replace(/(github\.com\/[^\s]+)/i, '').trim();
       currentProj = {
-        projectName: nameText || 'Project Name',
-        techStack: 'React, Vite, CSS',
+        projectName: nameText || '',
+        techStack: '',
         description: '',
         githubLink: ghLink
       };
@@ -228,40 +234,19 @@ export function parseResumeText(text) {
 
   return {
     personal: {
-      fullName: fullName || 'Candidate Name',
-      role: role || 'Professional Role',
-      email: email || 'candidate@domain.com',
-      phone: phone || '+1 (555) 000-0000',
-      location: location || 'Location, ST',
-      linkedin: linkedin || 'linkedin.com/in/username',
-      github: github || 'github.com/username',
+      fullName: fullName || '',
+      role: role || '',
+      email: email || '',
+      phone: phone || '',
+      location: location || '',
+      linkedin: linkedin || '',
+      github: github || '',
     },
-    summary: summary || 'A professional summary of accomplishments and technical expertise.',
-    skills: skills.length > 0 ? skills : ['React', 'JavaScript', 'HTML/CSS'],
-    experience: experience.length > 0 ? experience : [
-      {
-        company: 'Company Name',
-        role: 'Job Role',
-        startDate: 'Jan 2022',
-        endDate: 'Present',
-        description: '• Delivered key products and technical initiatives.'
-      }
-    ],
-    education: education.length > 0 ? education : [
-      {
-        college: 'University Name',
-        degree: 'Degree / Certificate',
-        startYear: '2015',
-        endYear: '2019'
-      }
-    ],
-    projects: projects.length > 0 ? projects : [
-      {
-        projectName: 'Project Name',
-        techStack: 'React, JavaScript',
-        description: 'Built a high performance web application.',
-        githubLink: ''
-      }
-    ]
+    summary: summary || '',
+    skills: skills,
+    experience: experience,
+    education: education,
+    projects: projects
   };
 }
+

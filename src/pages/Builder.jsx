@@ -5,7 +5,7 @@ import { Badge } from '../components/ui/Badge';
 import { ResumeForm } from '../components/builder/ResumeForm';
 import { ResumePreview } from '../components/builder/ResumePreview';
 import { Toast } from '../components/ui/Toast';
-import { extractTextFromPdf, extractTextFromDocx, parseResumeText } from '../utils/parser';
+import { extractTextFromPdf, extractTextFromDocx, parseResumeText, convertDocxToHtml } from '../utils/parser';
 
 // Analytics dashboard widgets
 import { ATSScoreCard } from '../components/builder/ATSScoreCard';
@@ -31,6 +31,27 @@ function formatBytes(bytes) {
   const i = Math.floor(Math.log(bytes) / Math.log(k));
   return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
 }
+
+const fileToBase64 = (file) => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = (error) => reject(error);
+  });
+};
+
+const dataURLtoBlob = (dataurl) => {
+  const arr = dataurl.split(',');
+  const mime = arr[0].match(/:(.*?);/)[1];
+  const bstr = atob(arr[1]);
+  let n = bstr.length;
+  const u8arr = new Uint8Array(n);
+  while (n--) {
+    u8arr[n] = bstr.charCodeAt(n);
+  }
+  return new Blob([u8arr], { type: mime });
+};
 
 const defaultState = {
   personal: {
@@ -156,6 +177,46 @@ export function Builder() {
     }
   });
 
+  const [importedFileUrl, setImportedFileUrl] = useState(null);
+  const [importedFileType, setImportedFileType] = useState(null);
+  const [docxHtml, setDocxHtml] = useState(() => {
+    return localStorage.getItem('resumeedge_imported_file_docx_html') || '';
+  });
+  const [previewTab, setPreviewTab] = useState(() => {
+    try {
+      const savedFile = localStorage.getItem(LOCAL_STORAGE_KEY_IMPORTED_FILE);
+      return savedFile ? 'original' : 'template';
+    } catch {
+      return 'template';
+    }
+  });
+
+  useEffect(() => {
+    const base64 = localStorage.getItem('resumeedge_imported_file_data');
+    const type = localStorage.getItem('resumeedge_imported_file_type') || '';
+    if (base64) {
+      try {
+        const blob = dataURLtoBlob(base64);
+        const url = URL.createObjectURL(blob);
+        setImportedFileUrl(url);
+        setImportedFileType(type);
+      } catch (e) {
+        console.error('Failed to restore imported file blob:', e);
+      }
+    } else {
+      setImportedFileUrl(null);
+      setImportedFileType(null);
+    }
+  }, [importedFile]);
+
+  useEffect(() => {
+    return () => {
+      if (importedFileUrl) {
+        URL.revokeObjectURL(importedFileUrl);
+      }
+    };
+  }, [importedFileUrl]);
+
   const handleImportFile = async (file) => {
     const ext = file.name.split('.').pop().toLowerCase();
     if (ext !== 'pdf' && ext !== 'docx') {
@@ -181,10 +242,25 @@ export function Builder() {
         throw new Error('The file contains no readable text.');
       }
 
+      let htmlContent = '';
+      if (ext === 'docx') {
+        try {
+          htmlContent = await convertDocxToHtml(file);
+          setDocxHtml(htmlContent);
+          localStorage.setItem('resumeedge_imported_file_docx_html', htmlContent);
+        } catch (docxErr) {
+          console.error('Failed to convert docx to html:', docxErr);
+        }
+      }
+
       addToast('Building resume...', 'info');
       await new Promise(r => setTimeout(r, 400));
 
       const parsedData = parseResumeText(text);
+
+      const base64Data = await fileToBase64(file);
+      localStorage.setItem('resumeedge_imported_file_data', base64Data);
+      localStorage.setItem('resumeedge_imported_file_type', file.type || ext);
 
       const fileRef = {
         name: file.name,
@@ -194,10 +270,30 @@ export function Builder() {
 
       localStorage.setItem(LOCAL_STORAGE_KEY_IMPORTED_FILE, JSON.stringify(fileRef));
       setImportedFile(fileRef);
+      setPreviewTab('original');
       
       setResumeData(parsedData);
       setShowOnboarding(false);
-      addToast('Import complete!', 'success');
+
+      const hasAnyExtracted = 
+        parsedData.personal.fullName ||
+        parsedData.personal.role ||
+        parsedData.personal.email ||
+        parsedData.personal.phone ||
+        parsedData.personal.location ||
+        parsedData.personal.linkedin ||
+        parsedData.personal.github ||
+        parsedData.summary ||
+        (parsedData.skills && parsedData.skills.length > 0) ||
+        (parsedData.experience && parsedData.experience.length > 0) ||
+        (parsedData.education && parsedData.education.length > 0) ||
+        (parsedData.projects && parsedData.projects.length > 0);
+
+      if (hasAnyExtracted) {
+        addToast('Resume imported. Some fields may require manual review.', 'success');
+      } else {
+        addToast('Resume uploaded successfully. Structured data could not be extracted.', 'warning');
+      }
     } catch (error) {
       console.error('Import failed:', error);
       addToast(`Import failed: ${error.message || 'Corrupted or unreadable file.'}`, 'warning');
@@ -208,7 +304,12 @@ export function Builder() {
     e.stopPropagation();
     if (window.confirm('Are you sure you want to remove the imported resume? This will clear the workspace.')) {
       localStorage.removeItem(LOCAL_STORAGE_KEY_IMPORTED_FILE);
+      localStorage.removeItem('resumeedge_imported_file_data');
+      localStorage.removeItem('resumeedge_imported_file_type');
+      localStorage.removeItem('resumeedge_imported_file_docx_html');
       setImportedFile(null);
+      setDocxHtml('');
+      setPreviewTab('template');
       setResumeData(defaultState);
       setShowOnboarding(true);
       addToast('Imported resume removed.', 'info');
@@ -306,7 +407,12 @@ export function Builder() {
       setSettings(defaultSettings);
       setSectionOrder(defaultOrder);
       localStorage.removeItem(LOCAL_STORAGE_KEY_IMPORTED_FILE);
+      localStorage.removeItem('resumeedge_imported_file_data');
+      localStorage.removeItem('resumeedge_imported_file_type');
+      localStorage.removeItem('resumeedge_imported_file_docx_html');
       setImportedFile(null);
+      setDocxHtml('');
+      setPreviewTab('template');
       setShowOnboarding(true);
       addToast('Workspace data cleared!', 'info');
     }
@@ -618,8 +724,73 @@ export function Builder() {
           </div>
 
           {/* Column 2: Live Sticky Preview (col-span-8) */}
-          <div className="lg:col-span-8 lg:sticky lg:top-24 lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto lg:pr-1 preview-scroll-container">
-            <ResumePreview data={resumeData} template={template} settings={settings} sectionOrder={sectionOrder} />
+          <div className="lg:col-span-8 lg:sticky lg:top-24 lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto lg:pr-1 preview-scroll-container flex flex-col">
+            {importedFile && (
+              <div className="flex justify-start items-center gap-2 mb-4 bg-slate-900/50 p-1 rounded-lg border border-slate-800/80 w-fit shrink-0">
+                <button
+                  onClick={() => setPreviewTab('original')}
+                  type="button"
+                  className={`text-xs font-semibold px-3 py-1.5 rounded-md transition-all cursor-pointer ${
+                    previewTab === 'original'
+                      ? 'bg-primary text-text shadow-sm'
+                      : 'text-muted hover:text-text'
+                  }`}
+                >
+                  Original Resume
+                </button>
+                <button
+                  onClick={() => setPreviewTab('template')}
+                  type="button"
+                  className={`text-xs font-semibold px-3 py-1.5 rounded-md transition-all cursor-pointer ${
+                    previewTab === 'template'
+                      ? 'bg-primary text-text shadow-sm'
+                      : 'text-muted hover:text-text'
+                  }`}
+                >
+                  Template Preview
+                </button>
+              </div>
+            )}
+
+            {previewTab === 'original' && importedFile ? (
+              <div className="w-full flex-grow">
+                {importedFileType?.includes('pdf') || importedFile?.name.toLowerCase().endsWith('.pdf') ? (
+                  <iframe
+                    src={importedFileUrl}
+                    title="Original PDF Preview"
+                    className="w-full h-[80vh] border border-slate-800 rounded-xl bg-white shadow-2xl animate-fade-in"
+                  />
+                ) : docxHtml ? (
+                  <div className="w-full h-[80vh] border border-slate-800 rounded-xl bg-white text-slate-900 p-8 shadow-2xl overflow-y-auto text-left docx-preview-container animate-fade-in">
+                    <style>{`
+                      .docx-preview-container h1, .docx-preview-container h2, .docx-preview-container h3 {
+                        font-weight: 700;
+                        color: #0f172a;
+                        margin-top: 1.5rem;
+                        margin-bottom: 0.5rem;
+                      }
+                      .docx-preview-container h1 { font-size: 1.75rem; border-b: 1px solid #e2e8f0; padding-bottom: 0.25rem; }
+                      .docx-preview-container h2 { font-size: 1.25rem; }
+                      .docx-preview-container p { margin-bottom: 0.75rem; line-height: 1.6; }
+                      .docx-preview-container ul, .docx-preview-container ol { margin-left: 1.5rem; margin-bottom: 1rem; list-style-type: disc; }
+                      .docx-preview-container li { margin-bottom: 0.25rem; }
+                    `}</style>
+                    <div dangerouslySetInnerHTML={{ __html: docxHtml }} />
+                  </div>
+                ) : (
+                  <div className="w-full h-[80vh] border border-slate-800 rounded-xl bg-slate-900/40 flex flex-col items-center justify-center p-8 text-center text-muted animate-fade-in">
+                    <FileText className="h-12 w-12 text-muted mb-4" />
+                    <p className="font-bold text-text mb-1">Document Viewer</p>
+                    <p className="text-xs max-w-xs leading-relaxed">The uploaded document preview is ready. Switch to the Template Preview tab to see styling options.</p>
+                  </div>
+                )}
+              </div>
+            ) : null}
+
+            {/* Template preview is rendered offscreen when original tab is active, so PDF export can always capture it */}
+            <div className={previewTab === 'original' && importedFile ? 'absolute left-[-9999px] top-0 w-full' : 'w-full'}>
+              <ResumePreview data={resumeData} template={template} settings={settings} sectionOrder={sectionOrder} />
+            </div>
           </div>
         </div>
 
