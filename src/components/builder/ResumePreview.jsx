@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { Badge } from '../ui/Badge';
+
 import { Mail, Phone, MapPin, Linkedin, Github, FileText } from 'lucide-react';
 
 const SPACING_MAP = {
@@ -158,9 +158,26 @@ export function ResumePreview({
         ) : (
           <div className="flex flex-wrap gap-1 pt-0.5">
             {skills.map((skill, idx) => (
-              <Badge key={idx} variant="muted" className="text-[9px] bg-slate-100 border-slate-200 py-0.5 px-2 font-semibold text-slate-800">
+              <span
+                key={idx}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  backgroundColor: '#F1F5F9',
+                  color: '#1E293B',
+                  border: '1px solid #CBD5E1',
+                  borderRadius: '9999px',
+                  fontSize: '9px',
+                  fontWeight: '600',
+                  paddingTop: '2px',
+                  paddingBottom: '2px',
+                  paddingLeft: '8px',
+                  paddingRight: '8px',
+                  lineHeight: '1.4',
+                }}
+              >
                 {skill}
-              </Badge>
+              </span>
             ))}
           </div>
         )}
@@ -284,9 +301,26 @@ export function ResumePreview({
           <h4 className={`text-[12.5px] font-bold ${colors.text} uppercase tracking-wider border-b border-slate-200 pb-1`}>Skills</h4>
           <div className="flex flex-wrap gap-1.5 pt-0.5">
             {skills.map((s, idx) => (
-              <Badge key={idx} variant="muted" className="text-[9px] bg-slate-100 border-slate-200 py-0.5 px-2 font-semibold text-slate-800">
+              <span
+                key={idx}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  backgroundColor: '#F1F5F9',
+                  color: '#1E293B',
+                  border: '1px solid #CBD5E1',
+                  borderRadius: '9999px',
+                  fontSize: '9px',
+                  fontWeight: '600',
+                  paddingTop: '2px',
+                  paddingBottom: '2px',
+                  paddingLeft: '8px',
+                  paddingRight: '8px',
+                  lineHeight: '1.4',
+                }}
+              >
                 {s}
-              </Badge>
+              </span>
             ))}
           </div>
         </div>
