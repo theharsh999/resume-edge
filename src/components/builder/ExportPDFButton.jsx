@@ -45,7 +45,7 @@ function oklchToRgb(L, C, H, alpha = 1) {
   return oklabToRgb(L, a, b, alpha);
 }
 
-// Helper: Replace oklab/oklch occurrences in CSS strings
+// Helper: Replace oklab/oklch occurrences in CSS strings with standard sRGB values
 function replaceColorsInString(str) {
   if (typeof str !== 'string') return str;
   if (!str.includes('oklab') && !str.includes('oklch')) return str;
@@ -53,20 +53,45 @@ function replaceColorsInString(str) {
   const colorRegex = /(oklab|oklch)\(([^)]+)\)/g;
   return str.replace(colorRegex, (match, type, inner) => {
     const parts = inner.trim().split(/[\s,+/]+/);
-    const numbers = parts
-      .map(p => parseFloat(p))
-      .filter(n => !isNaN(n));
-    if (numbers.length < 3) return match;
+    if (parts.length < 3) return match;
     
-    const n1 = numbers[0];
-    const n2 = numbers[1];
-    const n3 = numbers[2];
-    const alpha = numbers.length >= 4 ? numbers[3] : 1;
+    const parseComponent = (strVal) => {
+      let val = parseFloat(strVal);
+      if (isNaN(val)) return 0;
+      if (strVal.includes('%')) {
+        return val / 100;
+      }
+      return val;
+    };
+
+    const L = parseComponent(parts[0]);
+    
+    let n2 = parseFloat(parts[1]);
+    if (isNaN(n2)) n2 = 0;
+    if (parts[1].includes('%')) n2 = n2 / 100;
+
+    let n3 = parseFloat(parts[2]);
+    if (isNaN(n3)) n3 = 0;
+    if (parts[2].includes('%')) n3 = n3 / 100;
+    
+    // For oklch, parts[2] is hue which might contain angle units like deg, rad, grad, turn
+    if (type === 'oklch') {
+      const hStr = parts[2];
+      if (hStr.includes('rad')) {
+        n3 = (n3 * 180) / Math.PI;
+      } else if (hStr.includes('grad')) {
+        n3 = n3 * 0.9;
+      } else if (hStr.includes('turn')) {
+        n3 = n3 * 360;
+      }
+    }
+
+    const alpha = parts.length >= 4 ? parseComponent(parts[3]) : 1;
 
     if (type === 'oklab') {
-      return oklabToRgb(n1, n2, n3, alpha);
+      return oklabToRgb(L, n2, n3, alpha);
     } else {
-      return oklchToRgb(n1, n2, n3, alpha);
+      return oklchToRgb(L, n2, n3, alpha);
     }
   });
 }
@@ -91,14 +116,11 @@ export function ExportPDFButton({ elementId, filename = 'resume.pdf', onSuccess,
       return;
     }
 
-    // Capture original values for restoration
-    const originalBg = element.style.backgroundColor;
-    const originalColor = element.style.color;
-    const originalBorder = element.style.border;
-    const originalBorderRadius = element.style.borderRadius;
-    const originalBoxShadow = element.style.boxShadow;
-    const originalWidth = element.style.width;
-    const originalMaxWidth = element.style.maxWidth;
+    // Capture original animation and opacity values for restoration
+    const originalAnimation = element.style.animation;
+    const originalTransition = element.style.transition;
+    const originalOpacity = element.style.opacity;
+    const originalTransform = element.style.transform;
 
     // Intercept window.getComputedStyle to translate oklab/oklch colors to standard sRGB rgb/rgba
     const originalGetComputedStyle = window.getComputedStyle;
@@ -131,22 +153,19 @@ export function ExportPDFButton({ elementId, filename = 'resume.pdf', onSuccess,
     try {
       setIsExporting(true);
 
-      // Temporarily override styles for PDF printing (light mode layout with exact A4 dimensions)
-      element.style.setProperty('width', '794px', 'important');
-      element.style.setProperty('max-width', '794px', 'important');
-      element.style.setProperty('background-color', '#ffffff', 'important');
-      element.style.setProperty('color', '#111111', 'important');
-      element.style.setProperty('border', 'none', 'important');
-      element.style.setProperty('border-radius', '0px', 'important');
-      element.style.setProperty('box-shadow', 'none', 'important');
+      // Disable any layout shifts/animations and force full opacity/steady-state during capture
+      element.style.setProperty('animation', 'none', 'important');
+      element.style.setProperty('transition', 'none', 'important');
+      element.style.setProperty('opacity', '1', 'important');
+      element.style.setProperty('transform', 'none', 'important');
 
-      await new Promise((r) => setTimeout(r, 150)); // allow layout reflow
+      await new Promise((r) => setTimeout(r, 50)); // yield thread to ensure style application
 
       const canvas = await html2canvas(element, {
         scale: 3, // scale: 3 for high-DPI crispness
         useCORS: true,
         allowTaint: true,
-        backgroundColor: '#ffffff',
+        backgroundColor: null, // preserve background transparency exactly as rendered
         logging: false,
         imageTimeout: 0,
         removeContainer: true,
@@ -156,7 +175,8 @@ export function ExportPDFButton({ elementId, filename = 'resume.pdf', onSuccess,
         throw new Error('html2canvas returned an empty canvas.');
       }
 
-      const imgData = canvas.toDataURL('image/jpeg', 0.98);
+      // Use PNG format for lossless, crystal-clear text and layout reproduction
+      const imgData = canvas.toDataURL('image/png');
       if (!imgData || imgData === 'data:,') {
         throw new Error('Canvas toDataURL returned empty image data.');
       }
@@ -174,12 +194,12 @@ export function ExportPDFButton({ elementId, filename = 'resume.pdf', onSuccess,
       const imgH = pageW * canvasAspect;
 
       if (imgH <= pageH) {
-        pdf.addImage(imgData, 'JPEG', 0, 0, pageW, imgH);
+        pdf.addImage(imgData, 'PNG', 0, 0, pageW, imgH);
       } else {
         let yOffset = 0;
         while (yOffset < imgH) {
           if (yOffset > 0) pdf.addPage();
-          pdf.addImage(imgData, 'JPEG', 0, -yOffset, pageW, imgH);
+          pdf.addImage(imgData, 'PNG', 0, -yOffset, pageW, imgH);
           yOffset += pageH;
         }
       }
@@ -196,13 +216,10 @@ export function ExportPDFButton({ elementId, filename = 'resume.pdf', onSuccess,
       }
     } finally {
       // Restore original styles
-      element.style.backgroundColor = originalBg;
-      element.style.color = originalColor;
-      element.style.border = originalBorder;
-      element.style.borderRadius = originalBorderRadius;
-      element.style.boxShadow = originalBoxShadow;
-      element.style.width = originalWidth;
-      element.style.maxWidth = originalMaxWidth;
+      element.style.animation = originalAnimation;
+      element.style.transition = originalTransition;
+      element.style.opacity = originalOpacity;
+      element.style.transform = originalTransform;
 
       // Restore window.getComputedStyle
       window.getComputedStyle = originalGetComputedStyle;
