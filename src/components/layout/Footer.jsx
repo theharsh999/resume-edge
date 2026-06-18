@@ -70,11 +70,30 @@ export function Footer() {
         </div>
 
         {/* Bottom Section */}
-        <div className="border-t border-slate-900 mt-12 pt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-muted">
-          <p>&copy; {currentYear} ResumeEdge. All rights reserved.</p>
-          <p className="flex items-center mt-2 sm:mt-0">
-            Crafted for job seekers worldwide.
-          </p>
+        <div className="border-t border-slate-900 mt-12 pt-8 space-y-6">
+          {/* Copyright row */}
+          <div className="flex flex-col sm:flex-row items-center justify-between text-xs text-muted">
+            <p>&copy; {currentYear} ResumeEdge. All rights reserved.</p>
+            <p className="flex items-center mt-2 sm:mt-0">
+              Crafted for job seekers worldwide.
+            </p>
+          </div>
+
+          {/* Developer credit & Digital Heroes */}
+          <div className="border-t border-slate-900 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="text-xs text-muted text-center sm:text-left space-y-0.5">
+              <p>Developer: <span className="text-text font-semibold">Harsh Harinath Patel</span></p>
+              <p>Email: <a href="mailto:harshpatelji999@gmail.com" className="text-primary-light hover:text-primary transition-colors duration-200">harshpatelji999@gmail.com</a></p>
+            </div>
+            <a
+              href="https://digitalheroesco.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center px-5 py-2 rounded-full text-xs font-bold tracking-wide border border-primary/30 bg-primary/10 text-primary-light hover:bg-primary/20 hover:border-primary/50 hover:shadow-lg hover:shadow-primary/10 transition-all duration-300"
+            >
+              Built for Digital Heroes
+            </a>
+          </div>
         </div>
       </Container>
     </footer>
