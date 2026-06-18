@@ -1,4 +1,4 @@
-import React from 'react';
+import { useMemo } from 'react';
 import { Badge } from '../ui/Badge';
 import { Mail, Phone, MapPin, Linkedin, Github, FileText } from 'lucide-react';
 
@@ -222,7 +222,7 @@ export function ResumePreview({
   };
 
   // Modern Template (Asymmetric columns)
-  const ModernTemplate = () => (
+  const renderModernTemplate = () => (
     <div className="flex flex-col md:flex-row h-full">
       {/* Left Sidebar */}
       <div className="w-full md:w-[32%] border-b md:border-b-0 md:border-r border-slate-200 p-5 space-y-5 shrink-0 bg-slate-50">
@@ -264,7 +264,7 @@ export function ResumePreview({
   );
 
   // Professional Template (Serif elegant centered style)
-  const ProfessionalTemplate = () => (
+  const renderProfessionalTemplate = () => (
     <div className={`font-serif ${density.padding} ${density.spacing}`}>
       <div className="text-center border-b border-slate-200 pb-3 space-y-1.5">
         <h3 className="text-2xl font-semibold tracking-wide text-slate-900">{personal.fullName || 'Your Name'}</h3>
@@ -302,7 +302,7 @@ export function ResumePreview({
   );
 
   // Minimal Template (Clean compact columns)
-  const MinimalTemplate = () => (
+  const renderMinimalTemplate = () => (
     <div className={`${density.padding} ${density.spacing}`}>
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-200 pb-4 gap-2">
         <div className="space-y-0.5 text-left">
@@ -320,7 +320,7 @@ export function ResumePreview({
   );
 
   // Creative Template (Highlight side borders, clean cards, design-centric)
-  const CreativeTemplate = () => (
+  const renderCreativeTemplate = () => (
     <div className="flex flex-col md:flex-row h-full">
       {/* Side Column with custom border */}
       <div className={`w-full md:w-[30%] p-5 space-y-5 bg-slate-50 border-r border-slate-200 relative`}>
@@ -363,7 +363,7 @@ export function ResumePreview({
   );
 
   // Executive Template (Heavy corporate layouts, formal italics)
-  const ExecutiveTemplate = () => (
+  const renderExecutiveTemplate = () => (
     <div className={`p-6 md:p-8 space-y-5 font-serif text-slate-700 border-t-4 ${colors.borderSolid}`}>
       <div className="text-left flex flex-col sm:flex-row justify-between items-start sm:items-end border-b border-slate-200 pb-4 gap-3">
         <div className="space-y-1">
@@ -383,7 +383,7 @@ export function ResumePreview({
   );
 
   // Compact Template (High density grids, optimized margins)
-  const CompactTemplate = () => (
+  const renderCompactTemplate = () => (
     <div className={`p-4 md:p-5 ${density.spacing} font-sans`}>
       {/* Header Compact */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-baseline border-b border-slate-200 pb-2.5 gap-1.5">
@@ -421,12 +421,12 @@ export function ResumePreview({
         ) : (
           /* Render designated layout template (Always white paper style) */
           <div id="resume-print-content" className="animate-fade-in bg-white text-slate-800 rounded-xl border border-slate-200 shadow-[0_10px_35px_rgba(0,0,0,0.1)]">
-            {template === 'modern' && <ModernTemplate />}
-            {template === 'professional' && <ProfessionalTemplate />}
-            {template === 'minimal' && <MinimalTemplate />}
-            {template === 'creative' && <CreativeTemplate />}
-            {template === 'executive' && <ExecutiveTemplate />}
-            {template === 'compact' && <CompactTemplate />}
+            {template === 'modern' && renderModernTemplate()}
+            {template === 'professional' && renderProfessionalTemplate()}
+            {template === 'minimal' && renderMinimalTemplate()}
+            {template === 'creative' && renderCreativeTemplate()}
+            {template === 'executive' && renderExecutiveTemplate()}
+            {template === 'compact' && renderCompactTemplate()}
           </div>
         )}
       </div>

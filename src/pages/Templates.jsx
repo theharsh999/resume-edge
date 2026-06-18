@@ -1,13 +1,12 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Layout } from '../components/layout/Layout';
 import { Container } from '../components/ui/Container';
 import { Section } from '../components/ui/Section';
 import { Badge } from '../components/ui/Badge';
 import { Toast } from '../components/ui/Toast';
-import { Check } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { ResumePreview } from '../components/builder/ResumePreview';
-import { demoResumeData, defaultSettings, defaultOrder } from './Builder';
+import { demoResumeData, defaultOrder } from '../utils/constants';
 
 const LOCAL_STORAGE_KEY_TPL = 'resumeedge_template';
 const LOCAL_STORAGE_KEY_TOAST = 'resumeedge_pending_toast';
@@ -20,8 +19,7 @@ export function Templates() {
   const [toasts, setToasts] = useState([]);
 
   const addToast = (message, type = 'success') => {
-    const id = Date.now();
-    setToasts((prev) => [...prev, { id, message, type }]);
+    setToasts((prev) => [...prev, { id: prev.length ? Math.max(...prev.map(t => t.id)) + 1 : 1, message, type }]);
   };
   const dismissToast = (id) => setToasts((prev) => prev.filter((t) => t.id !== id));
 
