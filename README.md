@@ -1,8 +1,8 @@
-# ResumeEdge
+## 🌐 Live Demo
 
-> Create Professional Resumes. Get More Interviews.
+🔗 **Try ResumeEdge:** https://resume-edge-ai.vercel.app/
 
-ResumeEdge is a premium SaaS-style ATS (Applicant Tracking System) Resume Builder built with React, Vite, and Tailwind CSS. It is engineered with a strict dark mode aesthetic, layout rigidity, and clean typographic grids to ensure resumes pass recruitment filters while looking elegant.
+> Create ATS-friendly resumes, customize templates, analyze resume quality, and export professional PDFs instantly.
 
 ## 🚀 Tech Stack
 
@@ -40,7 +40,7 @@ resume-edge/
 
 ## 🎨 Design System
 
-ResumeEdge runs a custom design system mapped in [src/index.css](file:///Users/harshpatel/Internship/resume-edge/src/index.css):
+ResumeEdge runs a custom design system defined in `src/index.css`:
 
 * **Primary**: `#6366F1` (Indigo-500)
 * **Secondary**: `#8B5CF6` (Violet-500)
